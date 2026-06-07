@@ -29,16 +29,19 @@ CSV_TEMPLATES = {
         "FALSE,TRUE,TRUE,Hitachi Group,Hitachi Energy Ltd (Switzerland),\n"
     ),
     "commodities.csv": (
-        "code,name,unit,yf_ticker,category,active\n"
-        "CRUDE_BRENT,Brent Crude Oil,USD/barrel,BZ=F,energy,TRUE\n"
-        "CRUDE_WTI,WTI Crude Oil,USD/barrel,CL=F,energy,TRUE\n"
-        "COPPER,Copper Futures,USD/lb,HG=F,metal,TRUE\n"
-        "ALUMINIUM,Aluminium LME proxy,USD/ton,ALI=F,metal,TRUE\n"
-        "STEEL_HRC,US HRC Steel,USD/ton,HRC=F,metal,TRUE\n"
-        "GOLD,Gold Spot,USD/oz,GC=F,metal,TRUE\n"
-        "NATURAL_GAS,Henry Hub Natural Gas,USD/MMBtu,NG=F,energy,TRUE\n"
-        "PALM_OIL,Palm Oil,MYR/ton,,agri,TRUE\n"
-    ),
+    "code,name,unit,yf_ticker,category,active\n"
+    "CRUDE_BRENT,Brent Crude Oil,USD/barrel,BZ=F,energy,TRUE\n"
+    "CRUDE_WTI,WTI Crude Oil,USD/barrel,CL=F,energy,TRUE\n"
+    "COPPER,Copper Futures,USD/lb,HG=F,metal,TRUE\n"
+    "ALUMINIUM,Aluminium LME proxy,USD/ton,ALI=F,metal,TRUE\n"
+    "STEEL_HRC,US HRC Steel,USD/ton,HRC=F,metal,TRUE\n"
+    "GOLD,Gold Spot,USD/oz,GC=F,metal,TRUE\n"
+    "NATURAL_GAS,Henry Hub Natural Gas,USD/MMBtu,NG=F,energy,TRUE\n"
+    "PALM_OIL,Palm Oil,MYR/ton,,agri,TRUE\n"
+    "IRON_ORE,Iron Ore 62% Fe CFR China,USD/ton,TIO=F,metal,TRUE\n"
+    "COKING_COAL,Coking Coal Australia,USD/ton,,energy,TRUE\n"
+    "COAL_THERMAL,Newcastle Thermal Coal,USD/ton,MTF=F,energy,TRUE\n"
+),
     "stock_input_commodities.csv": (
         "symbol_nse,commodity_code,weight_pct,direction,notes\n"
         "ASIANPAINT,CRUDE_BRENT,40,negative,Major share of COGS via petrochemicals\n"
