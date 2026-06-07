@@ -24,9 +24,7 @@ Base = declarative_base()
 # ---------------------------------------------------------------------------
 
 class Stock(Base):
-    """Master table of stocks in the universe."""
     __tablename__ = "stocks"
-
     id = Column(Integer, primary_key=True)
     symbol_nse = Column(String(50), unique=True, nullable=False, index=True)
     symbol_yf = Column(String(50), unique=True, nullable=False)
@@ -45,9 +43,7 @@ class Stock(Base):
 
 
 class Commodity(Base):
-    """Master table of tracked commodities."""
     __tablename__ = "commodities"
-
     id = Column(Integer, primary_key=True)
     code = Column(String(50), unique=True, nullable=False)
     name = Column(String(200), nullable=False)
@@ -55,6 +51,68 @@ class Commodity(Base):
     yf_ticker = Column(String(50))
     category = Column(String(50))
     active = Column(Boolean, default=True)
+
+
+# ---------------------------------------------------------------------------
+# Layer 1b: Metadata graph relationship tables
+# ---------------------------------------------------------------------------
+
+class StockInputCommodity(Base):
+    """Links a stock to its key input commodities.
+    Weight = approximate % of COGS this commodity represents."""
+    __tablename__ = "stock_input_commodities"
+
+    id = Column(Integer, primary_key=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
+    commodity_id = Column(Integer, ForeignKey("commodities.id"), nullable=False)
+    weight_pct = Column(Float)
+    direction = Column(String(10))
+    notes = Column(Text)
+
+    __table_args__ = (
+        UniqueConstraint("stock_id", "commodity_id", name="uq_stock_input_commodity"),
+    )
+
+
+class StockOutputCommodity(Base):
+    """For V5: commodities/products a stock sells."""
+    __tablename__ = "stock_output_commodities"
+
+    id = Column(Integer, primary_key=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
+    commodity_id = Column(Integer, ForeignKey("commodities.id"), nullable=False)
+    weight_pct = Column(Float)
+    direction = Column(String(10))
+    notes = Column(Text)
+
+    __table_args__ = (
+        UniqueConstraint("stock_id", "commodity_id", name="uq_stock_output_commodity"),
+    )
+
+
+class StockCustomer(Base):
+    """For V7: who buys this company's products."""
+    __tablename__ = "stock_customers"
+
+    id = Column(Integer, primary_key=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
+    customer_name = Column(String(200), nullable=False)
+    customer_stock_id = Column(Integer, ForeignKey("stocks.id"))
+    sector = Column(String(100))
+    revenue_share_pct = Column(Float)
+    notes = Column(Text)
+
+
+class StockSupplier(Base):
+    """For V6: who supplies this company."""
+    __tablename__ = "stock_suppliers"
+
+    id = Column(Integer, primary_key=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False)
+    supplier_name = Column(String(200), nullable=False)
+    supplier_stock_id = Column(Integer, ForeignKey("stocks.id"))
+    origin = Column(String(50))
+    notes = Column(Text)
 
 
 # ---------------------------------------------------------------------------
