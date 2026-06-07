@@ -1,0 +1,26 @@
+# Core data
+pandas>=2.0
+numpy>=1.24
+yfinance>=0.2.40
+
+# DB
+sqlalchemy>=2.0
+
+# HTTP / scraping
+requests>=2.31
+beautifulsoup4>=4.12
+feedparser>=6.0
+
+# Dashboard
+streamlit>=1.30
+plotly>=5.18
+
+# Scheduling
+apscheduler>=3.10
+
+# Config / utils
+python-dotenv>=1.0
+pyyaml>=6.0
+
+# Testing
+pytest>=7.4
