@@ -43,3 +43,11 @@ logs/
 
 # Notebooks
 .ipynb_checkpoints/
+
+# Filled metadata (keep templates, exclude actual data)
+metadata/stocks.csv
+metadata/stock_input_commodities.csv
+metadata/stock_output_commodities.csv
+metadata/commodities.csv
+metadata/*.xlsx
+metadata/*.gsheet
