@@ -31,6 +31,7 @@ def ingest_stock_prices(symbols_yf: list[str] | None = None,
                 stock.symbol_yf,
                 start=start.isoformat(), end=end.isoformat(),
                 progress=False, auto_adjust=False,
+                multi_level_index=False,
             )
             if df is None or df.empty:
                 logger.warning(f"No data for {stock.symbol_yf}")
