@@ -51,3 +51,6 @@ metadata/stock_output_commodities.csv
 metadata/commodities.csv
 metadata/*.xlsx
 metadata/*.gsheet
+
+# Throwaway sanity-check scripts (not part of production pipeline)
+scripts/test_*.py
