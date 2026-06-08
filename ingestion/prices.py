@@ -1,5 +1,5 @@
 """
-Stock price ingestion via yfinance.
+Stock and commodity price ingestion via yfinance.
 Idempotent: re-running fills only missing dates.
 """
 
@@ -8,7 +8,7 @@ import logging
 
 import yfinance as yf
 
-from data.schema import Stock, PriceDaily, get_session
+from data.schema import Stock, Commodity, PriceDaily, CommodityDaily, get_session
 
 logger = logging.getLogger(__name__)
 
@@ -16,33 +16,26 @@ logger = logging.getLogger(__name__)
 def ingest_stock_prices(symbols_yf: list[str] | None = None,
                         lookback_days: int = 400, session=None):
     session = session or get_session()
-
     stocks = session.query(Stock).filter(Stock.active.is_(True)).all()
     if symbols_yf:
         stocks = [s for s in stocks if s.symbol_yf in symbols_yf]
 
     end = date_type.today()
     start = end - timedelta(days=lookback_days)
-
     total_written = 0
     for stock in stocks:
         try:
-            df = yf.download(
-                stock.symbol_yf,
-                start=start.isoformat(), end=end.isoformat(),
-                progress=False, auto_adjust=False,
-                multi_level_index=False,
+            df = yf.download(stock.symbol_yf, start=start.isoformat(), end=end.isoformat(),
+                             progress=False, auto_adjust=False,
+                             multi_level_index=False,
             )
             if df is None or df.empty:
                 logger.warning(f"No data for {stock.symbol_yf}")
                 continue
-
             for ts, row in df.iterrows():
                 d = ts.date() if hasattr(ts, "date") else ts
-                existing = (
-                    session.query(PriceDaily)
-                    .filter_by(stock_id=stock.id, date=d).first()
-                )
+                existing = (session.query(PriceDaily)
+                            .filter_by(stock_id=stock.id, date=d).first())
                 if existing:
                     continue
                 session.add(PriceDaily(
@@ -58,6 +51,42 @@ def ingest_stock_prices(symbols_yf: list[str] | None = None,
         except Exception as e:
             logger.exception(f"Failed ingesting {stock.symbol_yf}: {e}")
             session.rollback()
-
     logger.info(f"Stock prices: wrote {total_written} rows")
     return total_written
+
+
+def ingest_commodity_prices(lookback_days: int = 400, session=None):
+    session = session or get_session()
+    commodities = session.query(Commodity).filter(Commodity.active.is_(True)).all()
+
+    end = date_type.today()
+    start = end - timedelta(days=lookback_days)
+    total = 0
+    for c in commodities:
+        if not c.yf_ticker:
+            continue
+        try:
+            df = yf.download(c.yf_ticker, start=start.isoformat(), end=end.isoformat(),
+                             progress=False, auto_adjust=False,
+                             multi_level_index=False,
+            )
+            if df is None or df.empty:
+                continue
+            for ts, row in df.iterrows():
+                d = ts.date() if hasattr(ts, "date") else ts
+                existing = (session.query(CommodityDaily)
+                            .filter_by(commodity_id=c.id, date=d).first())
+                if existing:
+                    continue
+                session.add(CommodityDaily(
+                    commodity_id=c.id, date=d,
+                    close=float(row.get("Close", 0) or 0),
+                    source="yfinance",
+                ))
+                total += 1
+            session.commit()
+        except Exception as e:
+            logger.exception(f"Failed commodity {c.code}: {e}")
+            session.rollback()
+    logger.info(f"Commodity prices: wrote {total} rows")
+    return total
