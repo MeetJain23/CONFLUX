@@ -1,14 +1,14 @@
 """
 Vector 13: Geopolitics & Macros.
 
-Sector exposure profiles encode how each sector responds to macro variable moves.
+Adds 30-day macro momentum calculation.
 """
 
-from datetime import date as date_type
+from datetime import date as date_type, timedelta
 import logging
 
 from scorers.base import VectorScorer, ScoreResult
-from data.schema import Stock
+from data.schema import Stock, MacroDaily
 
 logger = logging.getLogger(__name__)
 
@@ -34,15 +34,43 @@ SECTOR_MACRO_EXPOSURE = {
 }
 
 DEFAULT_EXPOSURE = {"USDINR": 0.0, "US10Y": -0.2, "INDIA10Y": -0.2, "BRENT": -0.1, "DXY": -0.1}
+LOOKBACK_DAYS = 30
 
 
 class MacroScorer(VectorScorer):
     vector_id = 13
     vector_name = "Geopolitics & Macros"
 
+    def _get_macro_value(self, series_code, asof, tolerance_days=7):
+        row = (
+            self.session.query(MacroDaily)
+            .filter(
+                MacroDaily.series_code == series_code,
+                MacroDaily.date <= asof,
+                MacroDaily.date >= asof - timedelta(days=tolerance_days),
+            )
+            .order_by(MacroDaily.date.desc())
+            .first()
+        )
+        return row.value if row else None
+
+    def _get_macro_momentum(self, series_code, asof):
+        now = self._get_macro_value(series_code, asof)
+        then = self._get_macro_value(series_code, asof - timedelta(days=LOOKBACK_DAYS))
+        if now is None or then is None or then == 0:
+            return None
+        return (now / then) - 1.0
+
     def score_one(self, stock: Stock, asof: date_type) -> ScoreResult | None:
         exposure = SECTOR_MACRO_EXPOSURE.get(stock.sector, DEFAULT_EXPOSURE)
-        # TODO: pull macro momentum, compute contributions
+        components = {}
+        for series_code, sensitivity in exposure.items():
+            momentum = self._get_macro_momentum(series_code, asof)
+            components[series_code] = {
+                "momentum_30d": momentum,
+                "sensitivity": sensitivity,
+            }
+        # TODO: aggregate contributions, squash, finalize
         return ScoreResult(score=0.0, confidence=0.0,
-                           rationale=f"exposure profile for {stock.sector}",
-                           components={"exposure": exposure})
+                           rationale="momentum lookup only",
+                           components=components)
