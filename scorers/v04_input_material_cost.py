@@ -1,7 +1,7 @@
 """
 Vector 4: Input Material Cost.
 
-Computes 3-month change in input commodity prices.
+Computes weighted contribution from each input commodity's 3-month change.
 """
 
 from datetime import date as date_type, timedelta
@@ -19,8 +19,7 @@ class InputMaterialCostScorer(VectorScorer):
 
     LOOKBACK_DAYS = 90
 
-    def _get_commodity_price(self, commodity_id: int, asof: date_type, tolerance_days: int = 7):
-        """Latest available commodity close at-or-before asof, within tolerance."""
+    def _get_commodity_price(self, commodity_id, asof, tolerance_days=7):
         row = (
             self.session.query(CommodityDaily)
             .filter(
@@ -36,12 +35,12 @@ class InputMaterialCostScorer(VectorScorer):
     def score_one(self, stock: Stock, asof: date_type) -> ScoreResult | None:
         links = (
             self.session.query(StockInputCommodity)
-            .filter(StockInputCommodity.stock_id == stock.id)
-            .all()
+            .filter(StockInputCommodity.stock_id == stock.id).all()
         )
         if not links:
             return None
 
+        contributions = []
         components = {}
         for link in links:
             commodity = self.session.get(Commodity, link.commodity_id)
@@ -49,9 +48,21 @@ class InputMaterialCostScorer(VectorScorer):
                 continue
             price_now = self._get_commodity_price(commodity.id, asof)
             price_then = self._get_commodity_price(commodity.id, asof - timedelta(days=self.LOOKBACK_DAYS))
+            if price_now is None or price_then is None or price_then == 0:
+                continue
+            pct_change = (price_now / price_then) - 1.0
+            weight = (link.weight_pct or 0.0) / 100.0
+            contribution = -pct_change * weight
+            contributions.append(contribution)
             components[commodity.code] = {
-                "price_now": price_now,
-                "price_then": price_then,
+                "pct_change_3m": round(pct_change, 4),
+                "weight": round(weight, 3),
+                "contribution": round(contribution, 4),
             }
-        # TODO: aggregate into final score
-        return ScoreResult(score=0.0, confidence=0.0, rationale="lookup only", components=components)
+
+        if not contributions:
+            return None
+        raw_score = sum(contributions)
+        # TODO: squash through tanh, compute confidence, add rationale
+        return ScoreResult(score=raw_score, confidence=1.0,
+                           rationale=f"raw {raw_score:+.3f}", components=components)
