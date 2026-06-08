@@ -121,7 +121,7 @@ def ingest_commodity_prices(lookback_days: int = 400, session=None):
 MACRO_TICKERS = {
     "USDINR":   "INR=X",
     "US10Y":    "^TNX",
-    "INDIA10Y": "^INRX",     # if unavailable, switch to investing.com scraper later
+    # INDIA10Y: ^INRX delisted on yfinance. TODO: replace with FRED IRLTLT01INM156N in Phase 2.
     "BRENT":    "BZ=F",
     "DXY":      "DX-Y.NYB",
 }
