@@ -3,7 +3,7 @@
 import tempfile
 import os
 
-from data.schema import init_db, get_session, Stock, Commodity
+from data.schema import init_db, get_session, Stock
 
 
 def test_init_db_creates_tables():
@@ -12,6 +12,7 @@ def test_init_db_creates_tables():
         engine = init_db(db_path)
         assert os.path.exists(db_path)
         assert engine is not None
+        engine.dispose()
 
 
 def test_can_insert_and_query_stock():
@@ -23,3 +24,5 @@ def test_can_insert_and_query_stock():
                           name="Test Stock", sector="IT"))
         session.commit()
         assert session.query(Stock).filter_by(symbol_nse="TEST").first().name == "Test Stock"
+        session.close()
+        session.bind.dispose()
