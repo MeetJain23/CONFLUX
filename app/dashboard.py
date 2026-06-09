@@ -9,6 +9,9 @@ Phase 1 views:
     - Per-stock drill-down: which vectors are firing, with rationale
 """
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import json
 from datetime import date as date_type, timedelta
 
