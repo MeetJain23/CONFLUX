@@ -30,12 +30,12 @@ Nifty 500 universe. Metadata graph populated in parallel via Google Sheet.
 
 ## Roadmap
 
-| Phase | Vectors                      | Status        |
-|-------|------------------------------|---------------|
-| 1     | V4, V13                      | in progress   |
-| 2     | V2, V12                      | planned       |
-| 3     | V1, V7, V11                  | planned       |
-| 4     | V8, V10, V14, V15 (LLM-based)| planned       |
+| Phase | Vectors                      | Status            |
+|-------|------------------------------|---------------    |
+| 1     | V4, V13                      | published on 9 jun|
+| 2     | V2, V12                      | planned           |
+| 3     | V1, V7, V11                  | planned           |
+| 4     | V8, V10, V14, V15 (LLM-based)| planned           |
 
 ## The 15 Vectors
 
