@@ -72,5 +72,6 @@ conflux/
 
 ## Related projects
 
-- **carma-correlator-v1** — legacy commodity correlator, manual lookup tool
-- **CARMA** — Calibrated Adaptive Regime Market Architecture (separate project)
+- **carma-correlator-v1** - legacy commodity correlator, manual lookup tool
+- **CARMA** - Calibrated Adaptive Regime Market Architecture (separate project)
+- **STOCKPULSE** - gave directional move about the market
