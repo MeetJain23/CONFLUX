@@ -10,7 +10,7 @@ dist/
 .pytest_cache/
 .coverage
 htmlcov/
-
+pycache
 # Virtual environments
 .venv/
 venv/
@@ -40,7 +40,7 @@ secrets.json
 # Logs
 logs/
 *.log
-
+logs
 # Notebooks
 .ipynb_checkpoints/
 
