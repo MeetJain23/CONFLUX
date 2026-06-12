@@ -11,7 +11,10 @@ Each ingester is idempotent: re-running fills only missing dates.
 
 from datetime import date as date_type, timedelta
 import logging
-
+import os
+from dotenv import load_dotenv
+import pandas as pd
+load_dotenv()  # reads .env into environment variables
 import yfinance as yf
 
 from data.schema import (
@@ -162,4 +165,72 @@ def ingest_macros(lookback_days: int = 400, session=None):
             logger.exception(f"Failed macro {series_code}: {e}")
             session.rollback()
     logger.info(f"Macros: wrote {total} rows")
+    return total
+
+def ingest_india_10y(lookback_days: int = 400, session=None):
+    """
+    Fetch India 10-year government bond yield from FRED.
+    
+    FRED series: IRLTLT01INM156N (Long-Term Interest Rates: 10-Year, India,
+    Monthly, Not Seasonally Adjusted, percent per annum).
+    
+    Monthly granularity is sufficient for V13's 30-day momentum logic 
+    we forward-fill within months for daily lookup compatibility.
+    """
+    api_key = os.getenv("FRED_API_KEY")
+    if not api_key:
+        logger.warning("FRED_API_KEY not set; skipping India 10Y ingestion")
+        return 0
+    
+    try:
+        from fredapi import Fred
+    except ImportError:
+        logger.error("fredapi not installed; run: pip install fredapi")
+        return 0
+    
+    session = session or get_session()
+    fred = Fred(api_key=api_key)
+    
+    end = date_type.today()
+    start = end - timedelta(days=lookback_days)
+    
+    try:
+        series = fred.get_series(
+            "INDIRLTLT01STM",
+            observation_start=start.isoformat(),
+            observation_end=end.isoformat(),
+        )
+    except Exception as e:
+        logger.exception(f"FRED fetch failed: {e}")
+        return 0
+    
+    if series is None or series.empty:
+        logger.warning("FRED returned no data for IRLTLT01INM156N")
+        return 0
+    
+    # Forward-fill from monthly to daily so V13's daily lookup works
+    daily_index = pd.date_range(start=series.index.min(), end=end, freq="D")
+    daily_series = series.reindex(daily_index, method="ffill")
+    
+    total = 0
+    for ts, value in daily_series.items():
+        if pd.isna(value):
+            continue
+        d = ts.date() if hasattr(ts, "date") else ts
+        existing = (
+            session.query(MacroDaily)
+            .filter_by(series_code="INDIA10Y", date=d)
+            .first()
+        )
+        if existing:
+            continue
+        session.add(MacroDaily(
+            series_code="INDIA10Y", date=d,
+            value=float(value),
+            source="fred",
+        ))
+        total += 1
+    
+    session.commit()
+    logger.info(f"India 10Y (FRED): wrote {total} rows")
     return total

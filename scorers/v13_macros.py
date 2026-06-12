@@ -53,7 +53,7 @@ SECTOR_MACRO_EXPOSURE = {
     "Textiles":      {"USDINR": +0.5,  "US10Y": -0.2, "INDIA10Y": -0.2,  "BRENT": -0.2, "DXY": +0.1},
 }
 
-DEFAULT_EXPOSURE = {"USDINR": 0.0, "US10Y": -0.2, "INDIA10Y": -0.2, "BRENT": -0.1, "DXY": -0.1}
+DEFAULT_EXPOSURE = {"USDINR": 0.0, "US10Y": -0.2, "INDIA10Y": -0.3, "BRENT": -0.1, "DXY": -0.1}
 
 LOOKBACK_DAYS = 30          # macro momentum window
 SQUASH_GAIN = 4.0
