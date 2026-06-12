@@ -28,6 +28,15 @@ This is an **idea-generation engine**, not an auto-trader. Outputs go to a human
 **Phase 1 (in progress):** Foundation + V4 (input material cost) + V13 (macros).
 Nifty 500 universe. Metadata graph populated in parallel via Google Sheet.
 
+### Environment variables
+
+Some macro data is sourced from FRED (Federal Reserve Bank of St. Louis).
+Free API key at https://fred.stlouisfed.org/docs/api/api_key.html
+
+Add to a `.env` file in the project root:
+
+The `.env` file is gitignored.
+
 ## Roadmap
 
 | Phase | Vectors                      | Status            |
