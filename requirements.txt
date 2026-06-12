@@ -24,3 +24,7 @@ pyyaml>=6.0
 
 # Testing
 pytest>=7.4
+
+pip install fredapi
+
+pip install python-dotenv
