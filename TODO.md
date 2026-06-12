@@ -45,3 +45,16 @@
 - Query.get() deprecated. Update scripts/test_v4.py, scripts/test_v13.py,
   scripts/test_confluence.py: session.query(X).get(id) → session.get(X, id).
 - datetime.utcnow() deprecated in schema.py. Use datetime.now(datetime.UTC).
+
+## V13 sector-uniformity limitation (2026-06-13)
+
+- V13 produces identical scores for all stocks within a sector. Mathematically
+  inevitable given current design (sector × macros → one score).
+- Example: all 9 metals at -0.281, all 6 autos at +0.319, all 4 oil & gas
+  at -0.476.
+- Implication: V13 contributes sector-rotation signal only. Stock-level
+  differentiation must come from V4 + future per-stock vectors (V1, V11, V12).
+- Phase 3 option: per-stock macro sensitivity coefficients (e.g., Hindalco
+  more dollar-aluminium than Vedanta; JLR in TMPV adds GBP/EUR exposure).
+  39 stocks × 5 macros = 195 hand-curated numbers. Real moat work but
+  defer until other vectors are live.
