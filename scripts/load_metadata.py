@@ -99,20 +99,24 @@ def load_input_links(path: str, session):
             if not stock or not commodity:
                 logger.warning(f"skip link: stock={row['symbol_nse']} commodity={row['commodity_code']}")
                 continue
+            # Schema migration: CSV now uses cogs_weight_pct (was weight_pct).
+            # Direction column dropped from CSV — producers excluded from V4 instead.
+            # DB column `direction` retained for backward compatibility, defaulted to "negative".
+            weight_value = row.get("cogs_weight_pct") or row.get("weight_pct") or 0
             existing = (
                 session.query(StockInputCommodity)
                 .filter_by(stock_id=stock.id, commodity_id=commodity.id)
                 .first()
             )
             if existing:
-                existing.weight_pct = float(row.get("weight_pct") or 0)
-                existing.direction = row.get("direction") or "negative"
+                existing.weight_pct = float(weight_value)
+                existing.direction = "negative"
                 existing.notes = row.get("notes")
             else:
                 session.add(StockInputCommodity(
                     stock_id=stock.id, commodity_id=commodity.id,
-                    weight_pct=float(row.get("weight_pct") or 0),
-                    direction=row.get("direction") or "negative",
+                    weight_pct=float(weight_value),
+                    direction="negative",
                     notes=row.get("notes"),
                 ))
             n += 1
