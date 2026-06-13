@@ -1,0 +1,11 @@
+action_type,issuer_magnitude,peer_magnitude,decay_days,notes
+BUYBACK,0.40,0.05,60,Capital return signal; peers get mild positive read
+DEMERGER,0.30,0.10,60,Value-unlock for issuer; sector M&A signal for peers
+BONUS,0.20,0.00,45,Confidence signal but largely cosmetic
+SPLIT,0.15,0.00,30,Mostly cosmetic; mild liquidity signal
+SPECIAL_DIVIDEND,0.30,0.00,45,One-time cash return; treat as bullish
+BOARD_CHANGE_POSITIVE,0.15,0.00,30,New CEO/CFO appointment
+BOARD_CHANGE_NEGATIVE,-0.30,0.00,90,Departure or resignation under cloud
+PROMOTER_PLEDGE_INCREASE,-0.25,0.00,60,Promoter borrowing against shares; risk-on
+PROMOTER_PLEDGE_DECREASE,0.20,0.00,60,Pledge unwound; positive signal
+OTHER,0.00,0.00,30,Catch-all; manual review required

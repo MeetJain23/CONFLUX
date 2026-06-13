@@ -58,3 +58,36 @@
   more dollar-aluminium than Vedanta; JLR in TMPV adds GBP/EUR exposure).
   39 stocks × 5 macros = 195 hand-curated numbers. Real moat work but
   defer until other vectors are live.
+
+  ## Session retrospective (2026-06-13)
+
+- Path 4 (FRED INDIA10Y restore) — landed clean in ~90 min. FRED series
+  code was wrong on first try (IRLTLT01INM156N → INDIRLTLT01STM). Web
+  search caught it. Lesson: don't trust memorized series IDs for niche data.
+
+- Universe expansion 15 → 39 — the work compounded. Same code, 2.5x more
+  signal. Worth doing.
+
+- TATAMOTORS demerger / ghost data — caught only because Claude diagnosed
+  the V4 output, not because I'd have noticed at 2 AM. Two takeaways:
+  (a) loader hardening is real Phase 2 work, (b) corporate actions
+  feed will matter when V12 ships — IPOs and demergers are exactly what
+  V12 should detect.
+
+- V13 sector uniformity — known limitation, documented, will need
+  per-stock macro sensitivities in Phase 3 to fix properly.
+
+- Worked too late. Started Wednesday afternoon, didn't sleep before
+  "Thursday morning" V4 run. Next time: actual sleep break between
+  major sessions.
+
+  ## Metadata folder reorganization (Phase 2 hygiene)
+
+- Current state: metadata/ contains both curated user data (stocks.csv,
+  stock_input_commodities.csv) and configuration (v12_event_magnitudes.csv).
+  Gitignore explicitly lists curated files by name.
+- Better structure: metadata/curated/ (gitignored) and metadata/config/
+  (tracked). Single gitignore rule, semantic separation.
+- Cost: ~45 min refactor — move 3 CSVs, update load_metadata.py and
+  templates.py paths, update README and ADRs.
+- Defer until: V12 + V2 are shipped, or before adding another config-type CSV.
