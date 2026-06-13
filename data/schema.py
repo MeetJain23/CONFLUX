@@ -10,7 +10,7 @@ Design principles:
 
 from sqlalchemy import (
     Column, Integer, String, Float, Date, DateTime, Boolean,
-    ForeignKey, Text, UniqueConstraint, Index, create_engine,
+    ForeignKey, Text, UniqueConstraint, Index, create_engine, JSON,
 )
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from datetime import datetime
@@ -242,6 +242,51 @@ class IngestionRun(Base):
     rows_written = Column(Integer)
     error_message = Column(Text)
 
+class CorporateAction(Base):
+    """
+    Discrete corporate event affecting a stock's valuation.
+    
+    Source: NSE/BSE corporate actions feeds (Phase 1: NSE only).
+    Used by V12 (Re-rating Catalysts) scorer.
+    
+    action_type values (controlled vocabulary):
+        BUYBACK, DEMERGER, BONUS, SPLIT, SPECIAL_DIVIDEND,
+        BOARD_CHANGE_POSITIVE, BOARD_CHANGE_NEGATIVE,
+        PROMOTER_PLEDGE_INCREASE, PROMOTER_PLEDGE_DECREASE,
+        OTHER
+    
+    Idempotency: unique on (stock_id, action_type, action_date).
+    """
+    __tablename__ = "corporate_actions"
+    
+    id = Column(Integer, primary_key=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False, index=True)
+    
+    exchange = Column(String(8), nullable=False)  # NSE or BSE
+    action_type = Column(String(32), nullable=False, index=True)
+    action_date = Column(Date, nullable=False, index=True)
+    ex_date = Column(Date, nullable=True)
+    
+    # Optional override of the default magnitude from event_magnitudes table.
+    # Use when an event has unusual size (e.g., buyback at 20% of mcap vs typical 5%).
+    magnitude_override = Column(Float, nullable=True)
+    
+    raw_payload = Column(JSON, nullable=True)  # full response from exchange API
+    source_url = Column(String(512), nullable=True)
+    notes = Column(String(512), nullable=True)
+    
+    ingested_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    
+    stock = relationship("Stock", backref="corporate_actions")
+    
+    __table_args__ = (
+        UniqueConstraint("stock_id", "action_type", "action_date",
+                         name="uq_corp_action_stock_type_date"),
+        Index("ix_corp_action_date_type", "action_date", "action_type"),
+    )
+    
+    def __repr__(self):
+        return f"<CorporateAction {self.action_type} for stock_id={self.stock_id} on {self.action_date}>"
 
 # ---------------------------------------------------------------------------
 # DB initialization
