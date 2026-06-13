@@ -91,3 +91,21 @@
 - Cost: ~45 min refactor — move 3 CSVs, update load_metadata.py and
   templates.py paths, update README and ADRs.
 - Defer until: V12 + V2 are shipped, or before adding another config-type CSV.
+
+## V12 ingester open questions (for Commit 4)
+
+- NSE corporate actions API returned only 20 events with default params.
+  Probably needs explicit from_date/to_date query params to get 60-day
+  historical window for decay scoring.
+- subject field is free-text, not controlled vocabulary. Need parser to map:
+  "Buy Back of Shares" → BUYBACK
+  "Bonus N:M" → BONUS
+  "Stock Split..." → SPLIT
+  "Demerger" → DEMERGER
+  Routine "Dividend - Rs X Per Share" → IGNORE (most are not re-rating events)
+  Large dividends (yield > 2%) → SPECIAL_DIVIDEND
+- API may only return upcoming events. Need to verify if historical
+  events are accessible or if we need an archive endpoint.
+- Endpoint coverage gap: board changes and promoter pledging are likely
+  NOT in this feed. Probably need separate endpoints or alternative
+  sources. Phase 2 problem.
