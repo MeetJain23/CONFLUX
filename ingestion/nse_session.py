@@ -210,7 +210,7 @@ class NSESession:
                     )
                     logger.warning(str(last_error))
                 
-            except requests.exceptions.RequestException as e:
+            except requests.RequestException as e:
                 last_error = NSESessionError(f"Network error: {e}")
                 logger.warning(f"Network error on attempt {attempt}: {e}")
             
@@ -225,23 +225,35 @@ class NSESession:
             f"Last error: {last_error}"
         )
     
-    def fetch_corporate_actions(self) -> list[dict]:
+    def fetch_corporate_actions(self,
+                                 from_date: Optional[str] = None,
+                                 to_date: Optional[str] = None) -> list[dict]:
         """
-        Fetch all equity corporate actions from NSE.
+        Fetch corporate actions from NSE for all equities.
         
-        Returns a list of dicts in NSE's native shape. Common keys observed
-        in NSE responses: symbol, comp (company name), series, subject,
-        faceVal, exDate, recDate, bcStartDate, bcEndDate, ndStartDate,
-        ndEndDate, actDate.
+        Args:
+            from_date: 'DD-MM-YYYY' or None. If None, NSE returns default
+                       window (~next 7 days only). Pass explicit dates for
+                       historical windows.
+            to_date:   'DD-MM-YYYY' or None.
         
-        Returns empty list if NSE is reachable but has no actions.
-        Raises NSESessionError on failure.
+        Returns: list of dicts in NSE's native shape. See module docstring
+        for observed key names.
+        
+        Raises NSESessionError on persistent failure.
         """
-        logger.info("Fetching NSE corporate actions")
-        data = self.fetch_json(NSE_CORP_ACTIONS_URL)
+        url = NSE_CORP_ACTIONS_URL
+        params = []
+        if from_date:
+            params.append(f"from_date={from_date}")
+        if to_date:
+            params.append(f"to_date={to_date}")
+        if params:
+            url = f"{url}&{'&'.join(params)}"
         
-        # NSE typically wraps results in {"data": [...]} but the shape
-        # has varied historically. Handle both list-at-root and dict-wrapped.
+        logger.info(f"Fetching NSE corporate actions (from={from_date}, to={to_date})")
+        data = self.fetch_json(url)
+        
         if isinstance(data, list):
             actions = data
         elif isinstance(data, dict):
@@ -256,7 +268,7 @@ class NSESession:
         if len(actions) == 0:
             logger.warning(
                 "NSE returned 0 corporate actions — possible silent failure "
-                "(anti-bot rotation) or genuinely quiet day"
+                "(anti-bot rotation) or genuinely quiet window"
             )
         
         return actions
@@ -264,13 +276,14 @@ class NSESession:
 
 # --- Module-level convenience function ------------------------------------
 
-def fetch_corporate_actions() -> list[dict]:
+def fetch_corporate_actions(from_date: Optional[str] = None,
+                             to_date: Optional[str] = None) -> list[dict]:
     """
     Module-level convenience: fetch corporate actions in one call,
     auto-managing the session lifecycle.
     """
     with NSESession() as nse:
-        return nse.fetch_corporate_actions()
+        return nse.fetch_corporate_actions(from_date=from_date, to_date=to_date)
 
 
 if __name__ == "__main__":
