@@ -109,3 +109,5 @@
 - Endpoint coverage gap: board changes and promoter pledging are likely
   NOT in this feed. Probably need separate endpoints or alternative
   sources. Phase 2 problem.
+
+  added corporate actions
