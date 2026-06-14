@@ -35,8 +35,11 @@ Free API key at https://fred.stlouisfed.org/docs/api/api_key.html
 
 Add to a `.env` file in the project root:
 
-The `.env` file is gitignored.
+​```
+FRED_API_KEY=your_key_here
+​```
 
+The `.env` file is gitignored.
 ## Roadmap
 
 | Phase | Vectors                      | Status            |
@@ -78,6 +81,14 @@ conflux/
 ├── tests/             # unit tests
 └── docs/              # design decisions
 ```
+
+## Status
+
+**Phase 1 (shipped):** Foundation + V4 (input material cost) + V13 (macros).
+Universe currently at 39 stocks, expanding toward Nifty 100.
+
+**Phase 2 (in progress):** V12 (re-rating catalysts) — corporate actions
+ingestion from NSE, scoring engine, dashboard integration.
 
 ## Related projects
 
