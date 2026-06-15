@@ -111,3 +111,19 @@
   sources. Phase 2 problem.
 
   added corporate actions
+  
+  ## V12 magnitude calibration (Phase 2)
+
+- Magnitudes and decay windows in v12_event_magnitudes.csv are initial
+  guesses, not calibrated against real market behavior.
+- Phase 1 chose 60-day decay across most event types for simplicity.
+- Phase 2 work: track V12 signal vs forward stock returns over 3-6 months.
+  Tune per-event-type magnitudes based on which events actually predict
+  re-rating moves.
+- Specific questions to answer with real data:
+  - Do buybacks actually drive 40% issuer magnitude worth of move, or less?
+  - How long does demerger announcement signal persist? (60 days is a guess)
+  - Are peer signals real or noise? (current 5-10% peer magnitudes are
+    intuition, not evidence)
+- Open question: should magnitudes scale with event size (buyback % of mcap,
+  dividend yield, etc.) rather than be flat per type?
