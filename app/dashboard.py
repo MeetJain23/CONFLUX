@@ -124,7 +124,7 @@ st.title("CONFLUX")
 st.caption("Confluence Of Numerous Factors Linking Underlying eXposures")
 
 with st.sidebar:
-    asof = st.date_input("As-of date", value=date_type.today() - timedelta(days=1))
+    asof = st.date_input("As-of date", value=date_type.today())
     direction = st.radio("Direction filter", ["bullish", "bearish", "all"], horizontal=True)
     min_active = st.slider("Min active vectors", 1, 15, 1)
 
