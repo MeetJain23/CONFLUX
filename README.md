@@ -25,9 +25,13 @@ This is an **idea-generation engine**, not an auto-trader. Outputs go to a human
 
 ## Status
 
-**Phase 1 (in progress):** Foundation + V4 (input material cost) + V13 (macros).
-Nifty 500 universe. Metadata graph populated in parallel via Google Sheet.
+**Phase 1 (shipped Jun 9):** Foundation + V4 (input material cost) + V13 (geopolitics & macros).
 
+**Phase 2 (V12 shipped Jun 15):** V12 (re-rating catalysts) — NSE corporate
+actions ingestion, linear decay scoring, sector-peer scoping. V2 (government
+policy) next.
+
+**Universe:** currently 39 stocks across 14 sectors, expanding toward Nifty 100.
 ### Environment variables
 
 Some macro data is sourced from FRED (Federal Reserve Bank of St. Louis).
@@ -43,9 +47,9 @@ The `.env` file is gitignored.
 ## Roadmap
 
 | Phase | Vectors                      | Status            |
-|-------|------------------------------|---------------    |
-| 1     | V4, V13                      | published on 9 jun|
-| 2     | V2, V12                      | planned           |
+|-------|------------------------------|-------------------|
+| 1     | V4, V13                      | shipped Jun 9     |
+| 2     | V12, V2                      |V12 shipped Jun 15 |
 | 3     | V1, V7, V11                  | planned           |
 | 4     | V8, V10, V14, V15 (LLM-based)| planned           |
 
