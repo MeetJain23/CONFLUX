@@ -7,10 +7,10 @@ of 15 fundamental vectors that drive stock returns — input/output material cos
 government policy, promoter quality, supply/demand-side dynamics, macros, re-rating
 catalysts, global parallels, and structural cycles.
 
-The system ingests data daily, scores each Nifty 500 stock on each vector independently,
-then aggregates into a composite *confluence score*. Top of the daily report = stocks
-where 5+ vectors flash positive (or negative) simultaneously. Confluence is the signal.
-Single vectors are not.
+The system ingests data daily, scores each stock in its universe on each vector
+independently, then aggregates into a composite *confluence score*. Top of the daily
+report = stocks where 5+ vectors flash positive (or negative) simultaneously.
+Confluence is the signal. Single vectors are not.
 
 This is an **idea-generation engine**, not an auto-trader. Outputs go to a human (you).
 
@@ -32,26 +32,53 @@ actions ingestion, linear decay scoring, sector-peer scoping. V2 (government
 policy) next.
 
 **Universe:** currently 39 stocks across 14 sectors, expanding toward Nifty 100.
-### Environment variables
+
+## Quick start
+
+```bash
+# 1. Clone and set up environment
+git clone https://github.com/MeetJain23/CONFLUX.git
+cd CONFLUX
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS/Linux
+pip install -r requirements.txt
+
+# 2. Configure your FRED API key (see Environment variables below)
+
+# 3. Initialize the database and load metadata
+python -m scripts.load_metadata
+
+# 4. Run the daily pipeline
+python -m scripts.run_daily
+
+# 5. Launch the dashboard
+streamlit run app/dashboard.py
+```
+
+Note: the `metadata/` CSVs that drive the stock universe are gitignored as
+the project's moat. A fresh clone runs with empty metadata; you'll need to
+populate `metadata/stocks.csv`, `metadata/commodities.csv`, and
+`metadata/stock_input_commodities.csv` before the daily pipeline produces signal.
+
+## Environment variables
 
 Some macro data is sourced from FRED (Federal Reserve Bank of St. Louis).
 Free API key at https://fred.stlouisfed.org/docs/api/api_key.html
 
 Add to a `.env` file in the project root:
-
-​```
 FRED_API_KEY=your_key_here
-​```
 
 The `.env` file is gitignored.
+
 ## Roadmap
 
-| Phase | Vectors                      | Status            |
-|-------|------------------------------|-------------------|
-| 1     | V4, V13                      | shipped Jun 9     |
-| 2     | V12, V2                      |V12 shipped Jun 15 |
-| 3     | V1, V7, V11                  | planned           |
-| 4     | V8, V10, V14, V15 (LLM-based)| planned           |
+| Phase | Vectors                      | Status              |
+|-------|------------------------------|---------------------|
+| 1     | V4, V13                      | shipped Jun 9       |
+| 2     | V12, V2                      | V12 shipped Jun 15  |
+| 3     | V1, V7, V11                  | planned             |
+| 4     | V8, V10, V14, V15 (LLM-based)| planned             |
 
 ## The 15 Vectors
 
@@ -66,36 +93,9 @@ The `.env` file is gitignored.
 9. Global capex focus (solar, defence, AI, EV, nuclear, space)
 10. User behaviour shifts
 11. Global parallels (parent → Indian subsidiary)
-12. Re-rating scenarios
+12. Re-rating scenarios ← Phase 2
 13. Geopolitics & macros ← Phase 1
 14. Structural up/down cycles
 15. Moat / pricing power / capital efficiency
 
 ## Repo structure
-
-```
-conflux/
-├── data/              # SQLite DB + schema
-├── ingestion/         # one script per data source
-├── scorers/           # one script per vector
-├── confluence/        # aggregation engine
-├── app/               # Streamlit dashboard
-├── metadata/          # hand-curated CSVs
-├── scripts/           # orchestration utilities
-├── tests/             # unit tests
-└── docs/              # design decisions
-```
-
-## Status
-
-**Phase 1 (shipped):** Foundation + V4 (input material cost) + V13 (macros).
-Universe currently at 39 stocks, expanding toward Nifty 100.
-
-**Phase 2 (in progress):** V12 (re-rating catalysts) — corporate actions
-ingestion from NSE, scoring engine, dashboard integration.
-
-## Related projects
-
-- **carma-correlator-v1** - legacy commodity correlator, manual lookup tool
-- **CARMA** - Calibrated Adaptive Regime Market Architecture (separate project)
-- **STOCKPULSE** - gave directional move about the market
