@@ -220,7 +220,7 @@ into a single session rather than spreading it as ongoing weekly burden.
 
 
 
-\## Implementation surface
+## Implementation surface
 
 
 
@@ -228,21 +228,21 @@ New files:
 
 
 
-\- `data/schema.py` — add `PolicyEvent` table (similar shape to `CorporateAction`)
+- `data/schema.py` — add `PolicyEvent` table (similar shape to `CorporateAction`)
 
-\- `metadata/v2\_policy\_subtypes.csv` — tracked, config. Magnitudes and
+- `metadata/v2\_policy\_subtypes.csv` — tracked, config. Magnitudes and
 
 &#x20; decay windows per subtype, parallel to `v12\_event\_magnitudes.csv`
 
-\- `metadata/v2\_policy\_mappings.csv` — gitignored, moat. Explicit
+- `metadata/v2\_policy\_mappings.csv` — gitignored, moat. Explicit
 
 &#x20; per-subtype stock lists.
 
-\- `ingestion/policy\_news.py` — PIB RSS + Google News RSS ingester with
+- `ingestion/policy\_news.py` — PIB RSS + Google News RSS ingester with
 
 &#x20; curated keyword set, regex-based classification
 
-\- `scorers/v02\_govt\_policy.py` — scorer implementing the Mode A / B / C
+- `scorers/v02\_govt\_policy.py` — scorer implementing the Mode A / B / C
 
 &#x20; targeting logic above
 
@@ -252,33 +252,33 @@ Modified files:
 
 
 
-\- `scripts/run\_daily.py` — wire V2 into orchestrator
+- `scripts/run\_daily.py` — wire V2 into orchestrator
 
-\- `app/dashboard.py` — no changes required (drill-down auto-supports new vectors)
-
-
-
-Estimated effort: 6-8 hours focused work across 2 sessions.
+- `app/dashboard.py` — no changes required (drill-down auto-supports new vectors)
 
 
 
-\## Phase 2 calibration items
+Zstimated effort: 6-8 hours focused work across 2 sessions.
 
 
 
-\- Magnitudes in `v2\_policy\_subtypes.csv` start as initial guesses, need
+## Phase 2 calibration items
+
+
+
+- Magnitudes in `v2\_policy\_subtypes.csv` start as initial guesses, need
 
 &#x20; 3-6 months of forward-return data to tune.
 
-\- The 0.7 inferred-mode discount is an unvalidated heuristic. Tune with
+- The 0.7 inferred-mode discount is an unvalidated heuristic. Tune with
 
 &#x20; observed performance.
 
-\- Consider sub-sector granularity in Mode B (current design uses sector
+- Consider sub-sector granularity in Mode B (current design uses sector
 
 &#x20; level; sub-sector might improve precision for inferred events).
 
-\- Open question: should explicit and inferred contributions for the same
+- Open question: should explicit and inferred contributions for the same
 
 &#x20; stock-event combine, or should explicit override inferred entirely?
 
@@ -288,15 +288,15 @@ Estimated effort: 6-8 hours focused work across 2 sessions.
 
 
 
-\## References
+## References
 
 
 
-\- Design conversation: 2026-06-15 evening session
+- Design conversation: 2026-06-15 evening session
 
-\- Related: ADR-001 (SQLite over Postgres), ADR-002 (Vector score range)
+- Related: ADR-001 (SQLite over Postgres), ADR-002 (Vector score range)
 
-\- Related: TODO.md "V12 magnitude calibration" — same calibration pattern
+- Related: TODO.md "V12 magnitude calibration" — same calibration pattern
 
 &#x20; will apply to V2 magnitudes once shipped
 
