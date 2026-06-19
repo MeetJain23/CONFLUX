@@ -1,0 +1,35 @@
+subtype,issuer_magnitude,peer_magnitude,decay_days,notes
+PLI_SEMICONDUCTORS,0.40,0.00,90,Production-linked incentive scheme for semiconductors
+PLI_AUTO_COMPONENTS,0.30,0.00,90,PLI for auto components and EV
+PLI_PHARMA,0.30,0.00,90,PLI for API and bulk drugs
+PLI_TEXTILES,0.25,0.00,90,PLI for textiles and apparel
+PLI_ELECTRONICS,0.30,0.00,90,PLI for mobile and electronics manufacturing
+PLI_SOLAR,0.30,0.00,90,PLI for solar PV manufacturing
+PLI_TELECOM,0.30,0.00,90,PLI for telecom equipment
+PLI_FOOD_PROCESSING,0.25,0.00,90,PLI for food processing industry
+ANTI_DUMPING_STEEL,0.25,0.00,60,Anti-dumping duty protecting domestic steel
+ANTI_DUMPING_CHEMICALS,0.25,0.00,60,Anti-dumping on imported chemicals
+ANTI_DUMPING_SOLAR,0.30,0.00,60,Anti-dumping on solar cells/modules
+ANTI_DUMPING_ALUMINIUM,0.25,0.00,60,Anti-dumping protecting domestic aluminium
+TARIFF_INCREASE_STEEL,0.20,0.00,60,Import tariff hike on steel (positive for domestic)
+TARIFF_INCREASE_CRUDE,-0.15,0.00,45,Crude tariff hike (negative for downstream)
+TARIFF_DECREASE_GOLD,-0.20,0.00,60,Gold import duty cut (negative for organized jewelry)
+TARIFF_INCREASE_GOLD,0.15,0.00,60,Gold import duty hike (positive for organized jewelry)
+DUTY_INCREASE_STEEL,0.20,0.00,60,Customs duty hike on imported steel
+DUTY_DECREASE_CRUDE,0.20,0.00,45,Crude duty cut (positive for downstream refiners)
+GST_DECREASE_HOSPITALITY,0.25,0.00,60,GST rate cut for hotels/hospitality
+GST_INCREASE_TOBACCO,-0.20,0.00,90,GST hike on tobacco (negative for ITC etc.)
+GST_RATIONALIZATION,0.10,0.00,60,General GST simplification (mild positive)
+BUDGET_DEFENCE,0.35,0.00,180,Defence budget boost (capex cycle)
+BUDGET_INFRASTRUCTURE,0.25,0.00,180,Infrastructure capex announcement
+BUDGET_RAILWAYS,0.30,0.00,180,Railway capex push
+BUDGET_RENEWABLE_ENERGY,0.25,0.00,180,Green energy budget allocation
+BUDGET_AGRICULTURE,0.20,0.00,180,Agri sector budget boost (fertilizers etc.)
+PRIVATIZATION_BANK,0.30,0.00,90,PSU bank privatization announcement
+PRIVATIZATION_OIL,0.25,0.00,90,PSU oil company stake sale
+SUBSIDY_FERTILIZER,0.20,0.00,90,Fertilizer subsidy increase
+SUBSIDY_SOLAR,0.25,0.00,90,Solar manufacturing subsidy
+RBI_RATE_CUT,0.20,0.00,30,Repo rate cut (positive for rate-sensitive)
+RBI_RATE_HIKE,-0.20,0.00,30,Repo rate hike (negative for rate-sensitive)
+SEBI_DISCLOSURE_TIGHTENING,-0.10,0.00,45,Tighter disclosure (mild negative for opacity)
+OTHER,0.00,0.00,30,Catch-all; ingest but don't score
