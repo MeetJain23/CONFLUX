@@ -13,7 +13,7 @@ from sqlalchemy import (
     ForeignKey, Text, UniqueConstraint, Index, create_engine, JSON,
 )
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
-from datetime import datetime
+from datetime import datetime, date, timezone
 from pathlib import Path
 
 Base = declarative_base()
@@ -287,6 +287,58 @@ class CorporateAction(Base):
     
     def __repr__(self):
         return f"<CorporateAction {self.action_type} for stock_id={self.stock_id} on {self.action_date}>"
+
+class PolicyEvent(Base):
+    """
+    Discrete government policy event affecting one or more stocks.
+    
+    Source: PIB press releases (RSS) + Google News RSS (curated keywords).
+    Used by V02 (Government Policy) scorer.
+    
+    subtype values (controlled vocabulary, regex-classified from event text):
+        PLI_SEMICONDUCTORS, PLI_AUTO_COMPONENTS, PLI_PHARMA, PLI_TEXTILES, ...
+        ANTI_DUMPING_STEEL, ANTI_DUMPING_CHEMICALS, ...
+        TARIFF_INCREASE_<COMMODITY>, TARIFF_DECREASE_<COMMODITY>, ...
+        DUTY_INCREASE_<COMMODITY>, DUTY_DECREASE_<COMMODITY>, ...
+        BUDGET_<SECTOR>, GST_<DOMAIN>, PRIVATIZATION_<COMPANY>, ...
+        OTHER
+    
+    Idempotency: unique on (subtype, event_date, source_url).
+    Multiple sources may report the same event; source_url disambiguates.
+    """
+    __tablename__ = "policy_events"
+    
+    id = Column(Integer, primary_key=True)
+    
+    subtype = Column(String(64), nullable=False, index=True)
+    event_date = Column(Date, nullable=False, index=True)
+    
+    # Headline / summary text from the source (for audit + future re-classification)
+    headline_text = Column(String(1000), nullable=True)
+    
+    # Source identification
+    source = Column(String(32), nullable=False)  # "PIB" or "GOOGLE_NEWS"
+    source_url = Column(String(512), nullable=True)
+    
+    # Optional override of the default magnitude from policy subtypes table.
+    # Used when an event has unusual magnitude (e.g., a much-bigger-than-usual
+    # PLI scheme).
+    magnitude_override = Column(Float, nullable=True)
+    
+    raw_payload = Column(JSON, nullable=True)  # full RSS entry / news item
+    notes = Column(String(512), nullable=True)
+    
+    ingested_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), nullable=False)
+    
+    __table_args__ = (
+        UniqueConstraint("subtype", "event_date", "source_url",
+                         name="uq_policy_event_subtype_date_source"),
+        Index("ix_policy_event_date_subtype", "event_date", "subtype"),
+    )
+    
+    def __repr__(self):
+        return f"<PolicyEvent {self.subtype} on {self.event_date} from {self.source}>"
+
 
 # ---------------------------------------------------------------------------
 # DB initialization
