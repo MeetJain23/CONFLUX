@@ -101,3 +101,50 @@ Tracking known issues, Phase 2 work, and deferred decisions. Sectioned by concer
 - Verification gates matter. TATAMOTORS ghost, IngestionRun field bug,
   dashboard date default — all caught at "before commit" verification
   steps, not during code review. Re-run, query DB, eyeball output.
+
+
+  ## V2 classification tuning (Phase 2)
+
+- 281 items in first V2 ingestion run were skipped as unclassified.
+  Some are real signal we'd want to catch:
+  - "RBI keeps repo rate unchanged" — no match (only "cut"/"hike" patterns)
+  - "FDI relaxation in defence" — no FDI patterns yet
+  - Semiconductor mission updates without word "PLI"
+- Phase 2 work: log sample unclassified titles to file, manually review
+  in batches, add regex patterns for genuine missed signal.
+- Also: tune the high-volume subtypes. TARIFF_INCREASE_GOLD landed 17
+  articles in one run — likely many are restatements of the same event.
+  Consider deduplication by stripping outlet name from headline before
+  hashing for idempotency check.
+
+  ## V2 scorer calibration (Phase 2)
+
+Observed during V2 first run (2026-06-20). Architecture works correctly;
+score magnitudes need calibration with real forward-return data.
+
+- **Multi-day media cycles inflate scores.** Dedup by (event_date, subtype)
+  collapses same-day reports but not followup coverage. TITAN had 7
+  distinct date-subtype pairs from one underlying gold duty hike event,
+  producing score -0.389 when single-event signal would be ~-0.20.
+  Phase 2: consider "first-mention within 30 days" semantics or
+  semantic deduplication via NLP on article content.
+
+- **Retrospective articles trigger as if events were fresh.** PLI_PHARMA
+  article was a retrospective report on a years-old scheme but Mode B
+  scored SUNPHARMA at +0.299 as if a new policy was announced. Pattern:
+  classifier can't distinguish "X policy announced" from "X policy
+  performance update years later". Phase 2: shorter lookback for
+  news-detected events, or recency heuristics in classification.
+
+- **Lookback window may be too wide.** Currently 180 days (widest decay
+  window). For TARIFF events with 60-day decay, 180-day lookback catches
+  old retrospective articles. Consider per-subtype lookback aligned to
+  decay window.
+
+- **Mode B sector fallback magnitudes need refinement.** Current 0.7
+  discount across all inferred contributions is a single global heuristic.
+  Real precision requires per-subtype-per-sector calibration.
+
+- **Magnitudes in v2_policy_subtypes.csv are initial guesses.** Same
+  pattern as V12 magnitudes — tune with forward-return data over 3-6
+  months of live runs.
