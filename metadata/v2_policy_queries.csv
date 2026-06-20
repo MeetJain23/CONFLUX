@@ -1,0 +1,31 @@
+query,priority,notes
+PLI scheme India,high,Production-linked incentive announcements
+production linked incentive India,high,PLI variant phrasing
+anti dumping duty India,high,Anti-dumping rulings (CBIC notifications)
+import duty India,high,Customs duty changes
+customs duty change India,high,Customs duty variant phrasing
+GST rate change India,high,GST council decisions
+GST council decision,high,GST council variant
+Union Budget India,high,Annual budget announcements
+RBI repo rate decision,high,Repo rate changes
+RBI monetary policy,high,Broader monetary policy decisions
+PSU privatization India,high,Public sector privatization announcements
+disinvestment India,high,Government stake sales
+strategic sale India,high,Strategic disinvestment specifically
+MSP increase India,high,Minimum support price for crops
+NPPA drug price,high,Drug pricing regulator decisions
+semiconductor incentive India,medium,Semiconductor mission updates
+EV policy India,medium,Electric vehicle policy changes
+solar manufacturing subsidy India,medium,Solar PLI and subsidies
+green hydrogen policy India,medium,Green hydrogen mission
+defence procurement India,medium,Defence orders and capital allocation
+railway capex India,medium,Railway infrastructure budget
+fertilizer subsidy India,medium,Fertilizer subsidies and pricing
+drug pricing India,medium,Pharma pricing policy
+SEBI regulation change,medium,SEBI circulars and regulations
+FDI policy India,medium,Foreign direct investment policy
+FDI limit India,medium,FDI sectoral limit changes
+export incentive India,medium,Export promotion schemes
+WTO India ruling,medium,WTO disputes affecting India
+crude oil import duty,medium,Crude duty changes
+coal allocation India,medium,Coal block allocations
