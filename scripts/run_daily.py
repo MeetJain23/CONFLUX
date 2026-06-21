@@ -7,8 +7,8 @@ Usage:
 
 Order:
     1. ingest stock prices, commodity prices, macros, India 10Y (FRED),
-       and corporate actions (NSE)
-    2. run all active scorers (V4, V12, V13) for the date
+       corporate actions (NSE), and policy news (Google News RSS)
+    2. run all active scorers (V2, V4, V12, V13) for the date
     3. compute confluence for the date
 """
 
@@ -20,11 +20,13 @@ from data.schema import Stock, init_db, get_session
 from ingestion.prices import (
     ingest_stock_prices, ingest_commodity_prices, ingest_macros, ingest_india_10y,
 )
+from confluence.engine import compute_confluence
 from ingestion.corporate_actions import ingest_corporate_actions
+from ingestion.policy_news import ingest_policy_news
 from scorers.v04_input_material_cost import InputMaterialCostScorer
 from scorers.v13_macros import MacroScorer
 from scorers.v12_rerating import RerateCatalystScorer
-from confluence.engine import compute_confluence
+from scorers.v02_govt_policy import GovtPolicyScorer
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,6 +74,24 @@ def main():
             "Continuing daily run without corporate actions refresh. "
             "V12 will report stale-ingestion status until next successful run."
         )
+    # Policy news (V2): same failure-aware pattern. Google News RSS is
+    # generally reliable but RSS endpoints can change. V2 scorer detects
+    # stale ingestion via ingestion_runs log.
+    try:
+        pn_summary = ingest_policy_news(session=session)
+        logger.info(
+            f"Policy news: ingested={pn_summary['ingested']}, "
+            f"classified={pn_summary['classified']}, "
+            f"skipped_old={pn_summary['skipped_old']}, "
+            f"by_subtype={pn_summary['by_subtype']}"
+        )
+    except Exception as e:
+        logger.exception(f"Policy news ingestion failed: {e}")
+        logger.warning(
+            "Continuing daily run without policy news refresh. "
+            "V2 will report stale-ingestion status until next successful run."
+        )    
+
     # 2. Scorers
     logger.info("[2/3] scorers")
     stocks = session.query(Stock).filter(Stock.active.is_(True), Stock.in_nifty500.is_(True)).all()
@@ -88,6 +108,10 @@ def main():
     v12 = RerateCatalystScorer(session=session)
     v12_results = v12.score_universe(stocks, asof)
     v12.write_scores(v12_results, asof)
+
+    v2 = GovtPolicyScorer(session=session)
+    v2_results = v2.score_universe(stocks, asof)
+    v2.write_scores(v2_results, asof)
 
     # 3. Confluence
     logger.info("[3/3] confluence")
