@@ -82,22 +82,22 @@ SUBTYPE_TO_COMMODITY = {
 
 # Maps subtype suffix → sector name in stocks.sector
 # Mode B for BUDGET_/PLI_ subtypes uses this.
+#
+# Conservative approach: only map subtypes that have a clear, defensible
+# sector match in CONFLUX's current universe. Subtypes without a clean
+# mapping (TEXTILES, TELECOM, ELECTRONICS, SOLAR, SEMICONDUCTORS) are
+# omitted — they fall through to Mode C (no signal). Explicit mappings
+# in v2_policy_mappings.csv override this for known beneficiaries.
 SUBTYPE_TO_SECTOR = {
-    "DEFENCE": "Capital Goods",  # L&T is the only defence-adjacent stock in current universe
+    "DEFENCE": "Capital Goods",
     "INFRASTRUCTURE": "Capital Goods",
     "RAILWAYS": "Capital Goods",
     "RENEWABLE_ENERGY": "Capital Goods",
-    "AGRICULTURE": "Chemicals",  # UPL most agri-adjacent in universe
+    "AGRICULTURE": "Chemicals",
     "AUTO_COMPONENTS": "Auto",
     "PHARMA": "Pharma",
-    "TEXTILES": "Consumer",  # placeholder; no textile pure-play in universe yet
-    "ELECTRONICS": "IT",  # placeholder
-    "SOLAR": "Utilities",  # placeholder
-    "TELECOM": "Telecom",  # placeholder
     "FOOD_PROCESSING": "FMCG",
-    "SEMICONDUCTORS": "IT",  # placeholder
 }
-
 
 # --- Loaders --------------------------------------------------------------
 
