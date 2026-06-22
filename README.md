@@ -27,9 +27,12 @@ This is an **idea-generation engine**, not an auto-trader. Outputs go to a human
 
 **Phase 1 (shipped Jun 9):** Foundation + V4 (input material cost) + V13 (geopolitics & macros).
 
-**Phase 2 (V12 shipped Jun 15):** V12 (re-rating catalysts) — NSE corporate
-actions ingestion, linear decay scoring, sector-peer scoping. V2 (government
-policy) next.
+**Phase 2 (V12 + V2 shipped):** V12 re-rating catalysts (shipped Jun 15) and V2 government
+policy (shipped Jun 22). V2 uses a hybrid stock-targeting design (see ADR-003):
+explicit per-policy mappings as the moat, inferred fallback via existing
+metadata for common patterns, unmapped events ingest but produce no signal.
+
+**4 of 15 vectors live.** Universe currently 39 stocks across 14 sectors, expanding toward Nifty 100.
 
 **Universe:** currently 39 stocks across 14 sectors, expanding toward Nifty 100.
 
@@ -76,7 +79,7 @@ The `.env` file is gitignored.
 | Phase | Vectors                      | Status              |
 |-------|------------------------------|---------------------|
 | 1     | V4, V13                      | shipped Jun 9       |
-| 2     | V12, V2                      | V12 shipped Jun 15  |
+| 2     | V12, V2                      | both shipped Jun 22 |
 | 3     | V1, V7, V11                  | planned             |
 | 4     | V8, V10, V14, V15 (LLM-based)| planned             |
 
