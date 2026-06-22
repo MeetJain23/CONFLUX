@@ -148,3 +148,43 @@ score magnitudes need calibration with real forward-return data.
 - **Magnitudes in v2_policy_subtypes.csv are initial guesses.** Same
   pattern as V12 magnitudes — tune with forward-return data over 3-6
   months of live runs.
+
+  ## V2 calibration items discovered during ship session (2026-06-22)
+
+These were observed during V2 build/test cycle and accepted as Phase 2 work
+rather than blocking the ship.
+
+- **Mode B sector-inference coverage gap.** SUBTYPE_TO_SECTOR was narrowed
+  to remove false positives (TEXTILES, ELECTRONICS, SOLAR, TELECOM,
+  SEMICONDUCTORS placeholder mappings caused TITAN to wrongly score on
+  PLI_TEXTILES events). As universe expands toward Nifty 100, re-add
+  appropriate mappings: textile pure-plays (ARVIND/PAGEIND), telecom
+  (BHARTIARTL), semiconductor (DIXON/MTAR if added).
+
+- **Inferred-mapping overcoverage risk.** Explicit Mode A mappings can
+  overstate stocks that are tangentially related to a policy category.
+  Example caught during build: PIDILITIND was initially placed in
+  ANTI_DUMPING_CHEMICALS but adhesives aren't typically the affected
+  category in such rulings. Pattern to watch: stocks in broadly-named
+  sectors (Chemicals, Consumer, FMCG) where policy events target specific
+  sub-segments.
+
+- **PLI_AUTO_COMPONENTS row is broad.** Currently maps 6 OEMs as
+  beneficiaries of a component-PLI. OEMs are second-order beneficiaries
+  (via cheaper components), not direct PLI recipients. May be more
+  accurate to drop this Mode A row entirely and let Mode B sector
+  inference handle it. Revisit when actual PLI_AUTO_COMPONENTS events
+  trigger and we can observe magnitudes.
+
+- **PRIVATIZATION_OIL sign is contested.** Currently -0.10 (bearish on
+  competitive uncertainty). Alternative read: privatization improves
+  operational discipline → re-rating positive (see PSU bank privatization
+  history). When real PRIVATIZATION_OIL events fire, observe stock
+  movement vs V2 prediction; flip sign if mismatch is consistent.
+
+- **Score saturation from media-cycle duplication.** TITAN at -0.889
+  during build was technically correct given 5 distinct news days of
+  gold duty hike coverage, but a single underlying event reported across
+  5 days produces saturation that misrepresents intent. Dedup-by-date
+  helps for same-day duplicates only. Phase 3 work: semantic-level
+  deduplication using NLP on article content.
