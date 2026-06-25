@@ -188,3 +188,14 @@ rather than blocking the ship.
   5 days produces saturation that misrepresents intent. Dedup-by-date
   helps for same-day duplicates only. Phase 3 work: semantic-level
   deduplication using NLP on article content.
+
+  - **PLI_SEMICONDUCTORS overcoverage for DIXON.** DIXON is in the Mode A
+  mapping for PLI_SEMICONDUCTORS at +0.30 magnitude. 3 events triggered
+  PLI_SEMICONDUCTORS scoring in 24h, lifting DIXON's V2 contribution to
+  saturation territory. Real-world position: DIXON has a semiconductor
+  packaging JV initiative but isn't a primary semiconductor PLI recipient
+  yet. Pattern: PLI subtype announcements fire mapping even when the
+  specific announcement targets sector broadly rather than the mapped
+  stock specifically. Phase 2: consider sub-categorization or event-level
+  qualifier matching (e.g. "if event headline mentions DIXON by name,
+  full magnitude; else half").
