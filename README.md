@@ -2,6 +2,8 @@
 
 **Confluence Of Numerous Factors Linking Underlying eXposures**
 
+🔗 **Live dashboard:** [conflux.streamlit.app](https://conflux.streamlit.app)
+
 A multi-vector confluence engine for the Indian equity market. Built on the framework
 of 15 fundamental vectors that drive stock returns — input/output material costs,
 government policy, promoter quality, supply/demand-side dynamics, macros, re-rating
@@ -32,7 +34,12 @@ policy (shipped Jun 22). V2 uses a hybrid stock-targeting design (see ADR-003):
 explicit per-policy mappings as the moat, inferred fallback via existing
 metadata for common patterns, unmapped events ingest but produce no signal.
 
-**4 of 15 vectors live.** Universe currently 39 stocks across 14 sectors, expanding toward Nifty 100.
+**Deployment (shipped Jun 25):** Public dashboard at [conflux.streamlit.app](https://conflux.streamlit.app).
+Deployed via Streamlit Cloud with private Cloudflare R2 backing the SQLite DB
+— preserves the hand-curated metadata moat (stock universe, input commodities,
+policy mappings) while making the computed scores publicly inspectable.
+
+**4 of 15 vectors live.** Universe currently 79 stocks across 17 sectors, expanding toward Nifty 100.
 
 **Universe:** currently 39 stocks across 14 sectors, expanding toward Nifty 100.
 
