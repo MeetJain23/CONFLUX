@@ -20,6 +20,31 @@ import streamlit as st
 
 from data.schema import Stock, ConfluenceScore, VectorScore, get_session
 
+from dotenv import load_dotenv
+load_dotenv()
+
+from data.db_provisioner import ensure_db_exists, DBProvisionError
+
+
+@st.cache_resource(show_spinner="Loading database...")
+def _provision_db():
+    """
+    Provision the DB on container startup. Cached for the container's lifetime
+    so we don't re-download on every page reload.
+    
+    Returns the path to the DB. If provisioning fails, displays a Streamlit
+    error and stops execution.
+    """
+    try:
+        return ensure_db_exists()
+    except DBProvisionError as e:
+        st.error(f"Cannot start dashboard: {e}")
+        st.stop()
+
+
+# Call once at module load to ensure DB exists before any get_session() call
+_provision_db()
+
 
 st.set_page_config(page_title="CONFLUX", layout="wide")
 
