@@ -2,8 +2,10 @@
 Daily runner: one command to refresh CONFLUX.
 
 Usage:
-    python -m scripts.run_daily            # today's date
-    python -m scripts.run_daily 2026-05-22 # specific date
+    python -m scripts.run_daily              # today's date, local only
+    python -m scripts.run_daily 2026-05-22   # specific date, local only
+    python -m scripts.run_daily --push       # today's date + push DB to R2
+    python -m scripts.run_daily 2026-05-22 --push  # specific date + push
 
 Order:
     1. ingest stock prices, commodity prices, macros, India 10Y (FRED),
@@ -12,6 +14,7 @@ Order:
     3. compute confluence for the date
 """
 
+import argparse
 import sys
 import logging
 from datetime import date as date_type
@@ -35,14 +38,25 @@ logging.basicConfig(
 logger = logging.getLogger("conflux.daily")
 
 
-def parse_asof(argv):
-    if len(argv) > 1:
-        return date_type.fromisoformat(argv[1])
-    return date_type.today()
+def parse_args():
+    parser = argparse.ArgumentParser(description="CONFLUX daily refresh")
+    parser.add_argument(
+        "asof",
+        nargs="?",
+        default=None,
+        help="ISO date (YYYY-MM-DD), defaults to today",
+    )
+    parser.add_argument(
+        "--push",
+        action="store_true",
+        help="After local refresh, upload conflux.db to R2 (production refresh)",
+    )
+    return parser.parse_args()
 
 
 def main():
-    asof = parse_asof(sys.argv)
+    args = parse_args()
+    asof = date_type.fromisoformat(args.asof) if args.asof else date_type.today()
     logger.info(f"=== CONFLUX daily run for {asof} ===")
 
     init_db()
@@ -118,7 +132,17 @@ def main():
     compute_confluence(asof, session=session)
 
     logger.info("=== done ===")
-
-
-if __name__ == "__main__":
-    main()
+    
+    # 4. Optional: push to R2 for production refresh
+    if args.push:
+        logger.info("--push flag set; uploading DB to R2")
+        from scripts.upload_db_to_r2 import main as upload_main
+        try:
+            upload_main()
+        except SystemExit as e:
+            if e.code != 0:
+                logger.error(
+                    f"R2 upload failed with exit code {e.code}. "
+                    "Local DB is still updated; production data is stale."
+                )
+                raise
