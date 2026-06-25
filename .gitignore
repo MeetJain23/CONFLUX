@@ -11,6 +11,11 @@ dist/
 .coverage
 htmlcov/
 pycache
+
+# virtualenvs - all of them
+.venv*/
+venv*/
+
 # Virtual environments
 .venv/
 venv/
