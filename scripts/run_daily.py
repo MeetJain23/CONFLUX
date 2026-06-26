@@ -146,3 +146,7 @@ def main():
                     "Local DB is still updated; production data is stale."
                 )
                 raise
+
+
+if __name__ == "__main__":
+    main()
