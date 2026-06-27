@@ -23,6 +23,7 @@ from data.schema import Stock, init_db, get_session
 from ingestion.prices import (
     ingest_stock_prices, ingest_commodity_prices, ingest_macros, ingest_india_10y,
 )
+from ingestion.parent_prices import ingest_parent_prices
 from confluence.engine import compute_confluence
 from ingestion.corporate_actions import ingest_corporate_actions
 from ingestion.policy_news import ingest_policy_news
@@ -30,7 +31,7 @@ from scorers.v04_input_material_cost import InputMaterialCostScorer
 from scorers.v13_macros import MacroScorer
 from scorers.v12_rerating import RerateCatalystScorer
 from scorers.v02_govt_policy import GovtPolicyScorer
-
+from scorers.v11_global_parallels import GlobalParallelsScorer
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -68,6 +69,7 @@ def main():
     ingest_commodity_prices(session=session)
     ingest_macros(session=session)
     ingest_india_10y(session=session)
+    ingest_parent_prices(session=session)
     
     # Corporate actions: failure-aware. Logs to ingestion_runs regardless of
     # outcome. V12 scorer will detect stale ingestion via that log and
@@ -126,6 +128,10 @@ def main():
     v2 = GovtPolicyScorer(session=session)
     v2_results = v2.score_universe(stocks, asof)
     v2.write_scores(v2_results, asof)
+
+    v11 = GlobalParallelsScorer(session=session)
+    v11_results = v11.score_universe(stocks, asof)
+    v11.write_scores(v11_results, asof)
 
     # 3. Confluence
     logger.info("[3/3] confluence")
