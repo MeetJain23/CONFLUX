@@ -39,6 +39,7 @@ class Stock(Base):
     in_nifty500 = Column(Boolean, default=False)
     promoter_group = Column(String(200))    # e.g. "Tata Sons", "Mukesh Ambani family"
     global_parent = Column(String(200))     # for V11 — e.g. "Hitachi Ltd (Japan)"
+    parent_ticker = Column(String, nullable=True)
     active = Column(Boolean, default=True)
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
