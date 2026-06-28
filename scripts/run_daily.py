@@ -27,6 +27,7 @@ from ingestion.parent_prices import ingest_parent_prices
 from confluence.engine import compute_confluence
 from ingestion.corporate_actions import ingest_corporate_actions
 from ingestion.policy_news import ingest_policy_news
+from ingestion.insider_trades import ingest_insider_trades
 from scorers.v04_input_material_cost import InputMaterialCostScorer
 from scorers.v13_macros import MacroScorer
 from scorers.v12_rerating import RerateCatalystScorer
@@ -107,6 +108,24 @@ def main():
             "Continuing daily run without policy news refresh. "
             "V2 will report stale-ingestion status until next successful run."
         )    
+
+    # Insider trades (V1): SEBI PIT Reg 7(2) disclosures from NSE.
+    # Same failure-aware pattern as V12 corporate actions and V2 policy news.
+    # V1 scorer (Session 2) will detect stale ingestion via ingestion_runs log.
+    try:
+        it_summary = ingest_insider_trades(session=session)
+        logger.info(
+            f"Insider trades: ingested={it_summary['ingested']}, "
+            f"skipped_no_stock={it_summary['skipped_no_stock']}, "
+            f"skipped_duplicate={it_summary['skipped_duplicate']}, "
+            f"by_category={it_summary['by_category']}"
+        )
+    except Exception as e:
+        logger.exception(f"Insider trades ingestion failed: {e}")
+        logger.warning(
+            "Continuing daily run without insider trades refresh. "
+            "V1 will report stale-ingestion status until next successful run."
+        )
 
     # 2. Scorers
     logger.info("[2/3] scorers")
