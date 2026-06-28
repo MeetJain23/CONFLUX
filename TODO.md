@@ -199,3 +199,66 @@ rather than blocking the ship.
   stock specifically. Phase 2: consider sub-categorization or event-level
   qualifier matching (e.g. "if event headline mentions DIXON by name,
   full magnitude; else half").
+
+  ## V11 calibration (Phase 2)
+
+Observed during V11 first run (2026-06-27). Architecture works correctly;
+calibration items captured for future tuning.
+
+- **Global lag window W=10d is a default, not calibrated.** Bhaiya's
+  intuition: lag varies by pair. Hitachi/Siemens parent-sub track on
+  slower cycles than Honda/Maruti. Phase 2: instrument residual
+  distributions per pair, identify optimal W per (sub, parent), allow
+  pair-specific override.
+
+- **HYUNDAI β noisy.** Indian listing dates to Oct-2024 (~20 months
+  history). β will stabilize over time. Track whether V11 contribution
+  is dominated by noise vs signal in first 3-6 months.
+
+- **BOSCHLTD parent_ticker NULL.** Robert Bosch GmbH is privately held,
+  no public ticker. Phase 2 options: accept NO_SIGNAL, find a listed
+  entity in the Bosch ownership chain, or use a Stoxx auto-supplier
+  index as industry proxy. Defer until V11 has more live signal.
+
+- **MOTHERSON uses parent-of-parent proxy.** global_parent is Sumitomo
+  Wiring Systems (not listed); parent_ticker set to Sumitomo Electric
+  (5802.T) which owns Sumitomo Wiring. β absorbs the imperfection but
+  signal is one step removed. Assess whether 5802.T's diversified business
+  (cables, autoparts, infocom) dilutes the parent-sub signal too much.
+
+- **β-band confidence penalty (0.6 for |β| outside [0.2, 2.5])** is a
+  heuristic with no empirical basis. Validate against forward returns
+  and tune bounds over 3-6 months.
+
+- **Currency normalization deferred.** Parent prices in local currency
+  (EUR, JPY, KRW, USD, GBP, SGD, CHF). Percentage returns are
+  currency-neutral so V11 v0 is unaffected. If V11 extends to absolute
+  divergence signals later, currency layer needs adding.
+
+## V11 ingestion follow-up
+
+- **load_metadata.py does not read parent_ticker from stocks.csv.**
+  Currently parent_ticker lives in DB only, populated via one-shot
+  migration script `scripts/migrate_v11_parent_ticker.py`. Existing
+  rows preserved across load_metadata runs (upsert by symbol) but new
+  stocks added via CSV need manual migration. Phase 2: add parent_ticker
+  column to stocks.csv + extend load_metadata to handle it. ~15min work.
+
+## Data quality: NULL close values in PriceDaily (2026-06-27)
+
+Surfaced during V11 first run. MARUTI, HINDUNILVR, NESTLEIND, ITC
+crashed V11 with `float(None)` on close values. V11 patched to be
+NULL-safe via `filter(PriceDaily.close.isnot(None))` and a
+dict-comprehension guard, but the underlying data quality issue persists.
+
+- Root cause unknown. Likely from earlier ingestion runs before
+  consistent yfinance OHLC, or edge cases on ex-dividend / corporate
+  action dates.
+- Other scorers bulk-querying PriceDaily.close will hit the same trap
+  unless they also filter NULLs.
+- Phase 2 options: (a) NULL-filtering helper in data layer that all
+  scorers inherit, (b) one-time cleanup pass to re-fetch and backfill
+  NULL closes via yfinance, (c) add NOT NULL constraint at schema level
+  (requires backfill first).
+- Quick win: scan PriceDaily for NULL closes, identify (stock, date)
+  pairs, re-fetch.
