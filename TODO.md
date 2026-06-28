@@ -262,3 +262,30 @@ dict-comprehension guard, but the underlying data quality issue persists.
   (requires backfill first).
 - Quick win: scan PriceDaily for NULL closes, identify (stock, date)
   pairs, re-fetch.
+
+
+  ## V1 calibration items discovered during PIT ingester ship (2026-06-28)
+
+Observed during PIT exploration + first ingestion run. Real ingester-side
+issues that don't block the V1 ship but need handling.
+
+- **Person category values are noisier than canonical SEBI taxonomy.**
+  Actual values seen in first ingestion: `Promoters` (plural), `Promoter Group`,
+  `Immediate relative` (mixed case), `Employees/Designated Employees`,
+  `Other`, `-` (empty for some filings). Downstream code must use
+  case-insensitive substring matching, not exact-match on canonical terms.
+
+- **BAJFINANCE filing (pid=1197609) had unparseable transaction date.**
+  Lost 1 of 15 real CONFLUX-universe filings in first run. Inspect raw
+  payload — likely a fourth date format we haven't seen, or a genuinely
+  empty date field. Fix: extend NSE_DATE_FORMATS, or fallback to
+  intimation_date if acqfromDt/acqtoDt both missing.
+
+- **`-` and empty transaction_type values appear in NSE PIT data.**
+  1 of 15 had `-`. Downstream code must treat unparseable transaction_type
+  as no-op rather than crash.
+
+- **acq_mode taxonomy is broader than expected and includes routine modes
+  alongside opportunistic ones.** Same NSE record may show `Market Purchase`,
+  `Market Sale`, `Off Market`, `ESOP`, `Inter-se Transfer`, `Others`.
+  Worth one-pass classification on raw data before scorer design.
