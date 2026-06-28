@@ -34,12 +34,18 @@ policy (shipped Jun 22). V2 uses a hybrid stock-targeting design (see ADR-003):
 explicit per-policy mappings as the moat, inferred fallback via existing
 metadata for common patterns, unmapped events ingest but produce no signal.
 
+**Phase 3 (V11 shipped Jun 27):** V11 global parallels — for stocks with an
+international parent company, scores the gap between the Indian subsidiary's
+actual return and the β-implied expected return from parent moves. Catch-up
+bullish when sub lags parent; fade bearish when sub leads. Currently scores
+16 of 86 stocks (those with public parent listings in the universe).
+
 **Deployment (shipped Jun 25):** Public dashboard at [conflux.streamlit.app](https://conflux.streamlit.app).
 Deployed via Streamlit Cloud with private Cloudflare R2 backing the SQLite DB
 — preserves the hand-curated metadata moat (stock universe, input commodities,
 policy mappings) while making the computed scores publicly inspectable.
 
-**4 of 15 vectors live.** Universe currently 79 stocks across 17 sectors, expanding toward Nifty 100.
+**5 of 15 vectors live.** Universe: 86 stocks across 17 sectors, expanding toward Nifty 100.
 
 **Universe:** currently 39 stocks across 14 sectors, expanding toward Nifty 100.
 
@@ -83,13 +89,13 @@ The `.env` file is gitignored.
 
 ## Roadmap
 
-| Phase | Vectors                      | Status              |
-|-------|------------------------------|---------------------|
-| 1     | V4, V13                      | shipped Jun 9       |
-| 2     | V12, V2                      | both shipped Jun 22 |
-| 3     | V1, V7, V11                  | planned             |
-| 4     | V8, V10, V14, V15 (LLM-based)| planned             |
-
+| Phase | Vectors                       | Status              |
+|-------|-------------------------------|---------------------|
+| 1     | V4, V13                       | shipped Jun 9       |
+| 2     | V12, V2                       | both shipped Jun 22 |
+| 3     | V11                           | shipped Jun 27      |
+| 3     | V1, V7                        | next                |
+| 4     | V8, V10, V14, V15 (LLM-based) | planned             |
 ## The 15 Vectors
 
 1. Promoters (political ties, board changes, scams, pledging)
@@ -102,7 +108,7 @@ The `.env` file is gitignored.
 8. Services companies (recruitment, app downloads, ad-conversion)
 9. Global capex focus (solar, defence, AI, EV, nuclear, space)
 10. User behaviour shifts
-11. Global parallels (parent → Indian subsidiary)
+11. 11. Global parallels (parent → Indian subsidiary) ← Phase 3
 12. Re-rating scenarios ← Phase 2
 13. Geopolitics & macros ← Phase 1
 14. Structural up/down cycles
