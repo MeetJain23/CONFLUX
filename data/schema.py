@@ -289,6 +289,84 @@ class CorporateAction(Base):
     def __repr__(self):
         return f"<CorporateAction {self.action_type} for stock_id={self.stock_id} on {self.action_date}>"
 
+
+class InsiderTrade(Base):
+    """
+    SEBI Reg 7(2) PIT (Prohibition of Insider Trading) continual disclosures.
+    
+    One row per filing — promoter, director, KMP, or related person buying or
+    selling shares in their own company. Source: NSE corporates-pit endpoint.
+    
+    V1 scorer reads from this table. Scoring weights person_category
+    (Promoter > Director > KMP), acq_mode (Market Purchase = full signal,
+    ESOP/Inheritance/Gift = near zero), transaction_type (Buy/Sell), and
+    magnitude (pct_change in holding + secVal).
+    
+    Idempotency: (stock_id, pit_id) is the natural key. NSE provides a
+    unique 'pid' field per filing; we store it as pit_id and use it for
+    dedup.
+    """
+    __tablename__ = "insider_trades"
+
+    id = Column(Integer, primary_key=True)
+    stock_id = Column(Integer, ForeignKey("stocks.id"), nullable=False, index=True)
+
+    # NSE filing identifier — used for idempotency
+    pit_id = Column(String, nullable=False, index=True)
+
+    # Who filed
+    person_name = Column(String, nullable=False)
+    person_category = Column(String, nullable=False, index=True)
+    # Expected values per SEBI: 'Promoter', 'Promoter Group',
+    # 'Immediate Relative of Promoter', 'Director', 'KMP',
+    # 'Designated Persons', 'Others'
+
+    # What kind of transaction
+    acq_mode = Column(String)
+    # Routine: 'ESOP', 'Inheritance', 'Gift', 'Transmission'
+    # Opportunistic (high signal): 'Market Purchase', 'Off Market',
+    # 'Inter-se Transfer', 'Block Deal', 'Bulk Deal'
+
+    transaction_type = Column(String, nullable=False, index=True)
+    # 'Buy' or 'Sell' (from NSE's tdpTransactionType)
+
+    # Size
+    securities_qty = Column(Float)
+    securities_value = Column(Float)  # in INR
+    pct_before = Column(Float)
+    pct_after = Column(Float)
+
+    # When
+    transaction_date = Column(Date, nullable=False, index=True)
+    # NSE provides acqfromDt + acqtoDt; we use acqtoDt as the canonical
+    # transaction_date since that's when the position change completed
+    intimation_date = Column(Date)
+    # When the filing was made — usually 1-2 days after transaction
+
+    # SEBI regulation reference — should be '7(2)' for PIT disclosures
+    regulation = Column(String)
+
+    # Audit trail
+    exchange = Column(String, default="NSE")
+    raw_payload = Column(JSON)  # Full original NSE record for audit/replay
+    source_url = Column(String)
+    xbrl_url = Column(String)   # Link to underlying SEBI XBRL filing
+    notes = Column(String)
+
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+    __table_args__ = (
+        UniqueConstraint("stock_id", "pit_id", name="uq_insider_trade_stock_pit"),
+    )
+
+    def __repr__(self):
+        return (
+            f"<InsiderTrade(stock_id={self.stock_id}, "
+            f"person={self.person_name!r}, category={self.person_category!r}, "
+            f"type={self.transaction_type!r}, date={self.transaction_date})>"
+        )
+
+
 class PolicyEvent(Base):
     """
     Discrete government policy event affecting one or more stocks.
