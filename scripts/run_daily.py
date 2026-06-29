@@ -33,6 +33,7 @@ from scorers.v13_macros import MacroScorer
 from scorers.v12_rerating import RerateCatalystScorer
 from scorers.v02_govt_policy import GovtPolicyScorer
 from scorers.v11_global_parallels import GlobalParallelsScorer
+from scorers.v01_promoters import PromotersScorer
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -151,6 +152,10 @@ def main():
     v11 = GlobalParallelsScorer(session=session)
     v11_results = v11.score_universe(stocks, asof)
     v11.write_scores(v11_results, asof)
+
+    v1 = PromotersScorer(session=session)
+    v1_results = v1.score_universe(stocks, asof)
+    v1.write_scores(v1_results, asof)
 
     # 3. Confluence
     logger.info("[3/3] confluence")
