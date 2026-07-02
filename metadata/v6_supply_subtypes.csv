@@ -1,0 +1,13 @@
+subtype,issuer_magnitude,peer_magnitude,decay_days,notes
+SUPPLY_MONSOON_DEFICIT,-0.25,0.00,90,IMD below-normal forecast or El Nino confirmation. Hits agri-input and rural consumption.
+SUPPLY_MONSOON_NORMAL_ABOVE,0.20,0.00,90,Above-normal IMD forecast or La Nina confirmation. Benefits rural FMCG and agri-input.
+SUPPLY_HORMUZ_GULF_DISRUPTION,-0.30,0.00,45,Iran-Israel escalation tanker attacks Strait of Hormuz friction. Hits importers of crude DAP MEG methanol ammonia.
+SUPPLY_CHINA_STEEL_CUT,0.25,0.00,60,China supply-side reform or production cuts. Benefits Indian domestic steel producers.
+SUPPLY_CHINA_API_DUMP,-0.20,0.00,60,Chinese API undercutting or dumping. Hurts Indian PLI API players.
+SUPPLY_PHARMA_API_DISRUPTION,0.25,0.00,60,China API export curbs or plant shutdowns. Benefits Indian domestic API producers.
+SUPPLY_CRITICAL_MINERALS_CURB,-0.25,0.00,90,China gallium germanium graphite rare earth export restrictions. Hits electronics defence and EV stocks.
+SUPPLY_SEMICONDUCTOR_SHORTAGE,-0.20,0.00,45,Chip allocation events TSMC ASML curbs. Hurts auto OEMs and electronics manufacturers.
+SUPPLY_OPEC_CUT,-0.20,0.00,45,OPEC+ production cuts. Hurts refiners benefits upstream producers.
+SUPPLY_NATURAL_GAS_SHORTAGE,-0.20,0.00,60,Gas allocation cuts to fertilizer or CGD reroute. India-specific event class.
+SUPPLY_GLOBAL_TARIFF_SHOCK,-0.25,0.00,60,Section 232 or 301 or sudden tariff impositions. Asymmetric impact on Indian exporters.
+SUPPLY_FORCE_MAJEURE,-0.15,0.00,30,Catch-all plant fires port strikes named producer outages. Fast decay.
