@@ -1,0 +1,31 @@
+query,priority,notes
+IMD monsoon forecast,high,IMD monsoon predictions and skymet updates
+El Nino India monsoon,high,El Nino impact on Indian monsoon
+below normal monsoon India,high,Deficient monsoon warnings for kharif
+above normal monsoon India,medium,Above-normal forecast benefits rural
+La Nina India monsoon,medium,La Nina variant phrasing
+Strait of Hormuz disruption,high,Hormuz corridor shipping incidents
+tanker attack Persian Gulf,high,Attacks on tankers in Gulf region
+Iran Israel oil disruption,high,Regional escalation affecting crude and shipping
+Red Sea shipping attack,medium,Houthi related Red Sea corridor disruption
+China steel production cut,high,China supply-side reform and production cuts
+China steel export curb,medium,Chinese steel export restrictions variant
+China API export ban,high,Chinese pharma API export restrictions
+China pharma plant shutdown,medium,Chinese pharmaceutical plant closures
+Chinese API dumping,medium,China API price undercutting Indian producers
+China rare earth export curb,high,China rare earth export restrictions
+China gallium germanium export,high,China gallium germanium export controls
+China graphite export restriction,medium,China graphite export controls
+semiconductor shortage,high,Global chip supply constraints
+TSMC capacity chip allocation,medium,TSMC production and allocation constraints
+ASML export restriction,medium,ASML equipment export controls
+OPEC production cut,high,OPEC+ output cut decisions
+OPEC meeting decision,high,OPEC+ meeting outcomes variant
+Saudi oil production cut,medium,Saudi-led production adjustments
+India natural gas allocation,medium,APM gas allocation to fertilizer and CGD
+gas allocation cut CGD,medium,CGD sector gas allocation reduction
+Section 232 tariff,high,US Section 232 steel aluminum tariff actions
+Section 301 tariff China,high,US Section 301 China trade tariff actions
+reciprocal tariff India,medium,US reciprocal tariff measures affecting India
+force majeure commodity producer,medium,Producer force majeure declarations
+port strike India,medium,Indian port worker disruptions and blockages
