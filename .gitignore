@@ -60,4 +60,5 @@ metadata/v2_policy_mappings.csv
 
 # Throwaway sanity-check scripts (not part of production pipeline)
 scripts/test_*.py
-scripts/test_v2.py
+scripts/test_v2.pymetadata/v6_supply_mappings.csv
+metadata/v6_supply_mappings.csv
