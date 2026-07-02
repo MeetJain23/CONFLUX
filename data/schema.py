@@ -418,7 +418,74 @@ class PolicyEvent(Base):
     def __repr__(self):
         return f"<PolicyEvent {self.subtype} on {self.event_date} from {self.source}>"
 
+class SupplyEvent(Base):
+    """
+    Discrete supply-side disruption event affecting one or more stocks.
+    
+    Source: Google News RSS (V0; supply-disruption keyword set), with
+    provisions to add specialized sources later (IMD weather portal for
+    MONSOON_*, OPEC press releases for OPEC_*, MOSPI gas allocation
+    notices for NATURAL_GAS_*, customs data for CHINA_API_*).
+    
+    Used by V06 (Supply Disruption) scorer.
+    
+    subtype values (controlled vocabulary, regex-classified from event text):
+        SUPPLY_MONSOON_DEFICIT, SUPPLY_MONSOON_NORMAL_ABOVE,
+        SUPPLY_HORMUZ_GULF_DISRUPTION, SUPPLY_CHINA_STEEL_CUT,
+        SUPPLY_CHINA_API_DUMP, SUPPLY_PHARMA_API_DISRUPTION,
+        SUPPLY_CRITICAL_MINERALS_CURB, SUPPLY_SEMICONDUCTOR_SHORTAGE,
+        SUPPLY_OPEC_CUT, SUPPLY_NATURAL_GAS_SHORTAGE,
+        SUPPLY_GLOBAL_TARIFF_SHOCK, SUPPLY_FORCE_MAJEURE
+    
+    Idempotency: unique on (subtype, event_date, source_url).
+    Multiple outlets may report the same event; source_url disambiguates.
+    """
+    __tablename__ = "supply_events"
+    
+    id = Column(Integer, primary_key=True)
+    
+    subtype = Column(String(64), nullable=False, index=True)
+    event_date = Column(Date, nullable=False, index=True)
+    
+    # Headline / summary text from the source (for audit + future re-classification)
+    headline_text = Column(String(1000), nullable=True)
+    
+    # Where the disruption originated. Lets calibration distinguish
+    # "China API curb" from "Iran-driven Hormuz disruption" even when
+    # both classify into the same broad subtype.
+    source_country = Column(String(64), nullable=True)
+    
+    # Scope of impact: "global" / "regional" / "india_specific".
+    # MONSOON is india_specific. HORMUZ is regional. OPEC_CUT is global.
+    geography_scope = Column(String(32), nullable=True)
+    
+    # Coarse 0-1 severity extracted at classification time. Optional;
+    # used by Phase 2 calibration to scale magnitudes per-event rather
+    # than per-subtype.
+    event_severity = Column(Float, nullable=True)
+    
+    # Source identification
+    source = Column(String(32), nullable=False)  # "GOOGLE_NEWS" initially
+    source_url = Column(String(512), nullable=True)
+    
+    # Optional per-event magnitude override from default in subtypes table
+    magnitude_override = Column(Float, nullable=True)
+    
+    raw_payload = Column(JSON, nullable=True)
+    notes = Column(String(512), nullable=True)
+    
+    ingested_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), nullable=False)
+    
+    __table_args__ = (
+        UniqueConstraint("subtype", "event_date", "source_url",
+                         name="uq_supply_event_subtype_date_source"),
+        Index("ix_supply_event_date_subtype", "event_date", "subtype"),
+    )
+    
+    def __repr__(self):
+        return f"<SupplyEvent {self.subtype} on {self.event_date} from {self.source_country or 'unknown'}>"
 
+        
 # ---------------------------------------------------------------------------
 # DB initialization
 # ---------------------------------------------------------------------------
