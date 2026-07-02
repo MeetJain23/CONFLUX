@@ -27,6 +27,7 @@ from ingestion.parent_prices import ingest_parent_prices
 from confluence.engine import compute_confluence
 from ingestion.corporate_actions import ingest_corporate_actions
 from ingestion.policy_news import ingest_policy_news
+from ingestion.supply_news import ingest_supply_news
 from ingestion.insider_trades import ingest_insider_trades
 from scorers.v04_input_material_cost import InputMaterialCostScorer
 from scorers.v13_macros import MacroScorer
@@ -109,6 +110,26 @@ def main():
             "Continuing daily run without policy news refresh. "
             "V2 will report stale-ingestion status until next successful run."
         )    
+
+    # Supply news (V6): same failure-aware pattern as V2 policy news.
+    # Google News RSS with V6-specific query set. V6 scorer (Session 3)
+    # will detect stale ingestion via ingestion_runs log.
+    try:
+        sn_summary = ingest_supply_news(session=session)
+        logger.info(
+            f"Supply news: ingested={sn_summary['ingested']}, "
+            f"classified={sn_summary['classified']}, "
+            f"skipped_old={sn_summary['skipped_old']}, "
+            f"fetch_errors={sn_summary.get('fetch_errors', 0)}, "
+            f"by_subtype={sn_summary['by_subtype']}"
+        )
+    except Exception as e:
+        logger.exception(f"Supply news ingestion failed: {e}")
+        logger.warning(
+            "Continuing daily run without supply news refresh. "
+            "V6 will report stale-ingestion status until next successful run."
+        )
+
 
     # Insider trades (V1): SEBI PIT Reg 7(2) disclosures from NSE.
     # Same failure-aware pattern as V12 corporate actions and V2 policy news.
