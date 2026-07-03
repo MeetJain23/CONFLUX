@@ -10,7 +10,7 @@ Usage:
 Order:
     1. ingest stock prices, commodity prices, macros, India 10Y (FRED),
        corporate actions (NSE), and policy news (Google News RSS)
-    2. run all active scorers (V2, V4, V12, V13) for the date
+    2. 2. run all active scorers (V2, V4, V6, V11, V12, V13, V1) for the date
     3. compute confluence for the date
 """
 
