@@ -21,7 +21,7 @@ This is an **idea-generation engine**, not an auto-trader. Outputs go to a human
 1. **Stock Metadata Graph** — hand-curated facts per stock (sectors, input commodities,
    customers, suppliers, global parents, promoter groups, peers). This is the moat.
 2. **Data Ingestion Pipelines** — scheduled jobs that fetch prices, commodities, FX,
-   rates, corporate announcements, policy news, IPO calendar.
+   rates, corporate announcements, policy news, insider trades, supply-disruption news.
 3. **Vector Scorers** — one module per vector. Each outputs -1.0 to +1.0 per stock per day.
 4. **Confluence Engine + Dashboard** — aggregates active vectors, ranks setups, Streamlit UI.
 
@@ -40,14 +40,29 @@ actual return and the β-implied expected return from parent moves. Catch-up
 bullish when sub lags parent; fade bearish when sub leads. Currently scores
 16 of 86 stocks (those with public parent listings in the universe).
 
+**Phase 3 (V1 shipped Jun 28):** V1 promoters — insider trades from SEBI PIT
+Regulation 7(2) disclosures. Tanh-squashed scoring with category × mode ×
+signed magnitude × time decay × cluster bonus. Sparse by design: only fires
+when promoter or KMP activity is disclosed within the lookback window.
+Reads the underlying signal without laundering it through news sentiment.
+
+**Phase 3 (V6 shipped Jul 3):** V6 supply disruption — discrete supply-side
+events across 12 subtype categories (monsoon deficit/surplus, Hormuz corridor,
+China steel cuts, China API dumping/disruption, critical minerals curbs,
+semiconductor shortage, OPEC cuts, natural gas allocation, global tariff
+shocks, force majeure). Mode-A-only architecture: only stocks explicitly
+mapped in the moat file receive signal — same sparse-vector pattern as
+V1 and V11. Per-subtype contribution cap prevents multi-day news cycle
+saturation (10 consecutive Hormuz stories don't accumulate to 10× the
+default magnitude; direction preserved, magnitude bounded).
+
 **Deployment (shipped Jun 25):** Public dashboard at [conflux.streamlit.app](https://conflux.streamlit.app).
 Deployed via Streamlit Cloud with private Cloudflare R2 backing the SQLite DB
 — preserves the hand-curated metadata moat (stock universe, input commodities,
-policy mappings) while making the computed scores publicly inspectable.
+policy mappings, supply-event mappings, promoter mappings) while making the
+computed scores publicly inspectable.
 
-**5 of 15 vectors live.** Universe: 86 stocks across 17 sectors, expanding toward Nifty 100.
-
-**Universe:** currently 39 stocks across 14 sectors, expanding toward Nifty 100.
+**7 of 15 vectors live.** Universe: 86 stocks across 17 sectors, expanding toward Nifty 100.
 
 ## Quick start
 
@@ -72,10 +87,12 @@ python -m scripts.run_daily
 streamlit run app/dashboard.py
 ```
 
-Note: the `metadata/` CSVs that drive the stock universe are gitignored as
-the project's moat. A fresh clone runs with empty metadata; you'll need to
-populate `metadata/stocks.csv`, `metadata/commodities.csv`, and
-`metadata/stock_input_commodities.csv` before the daily pipeline produces signal.
+Note: the `metadata/` CSVs that drive the stock universe and per-vector
+mappings are gitignored as the project's moat. A fresh clone runs with
+empty metadata; you'll need to populate `metadata/stocks.csv`,
+`metadata/commodities.csv`, `metadata/stock_input_commodities.csv`,
+`metadata/v2_policy_mappings.csv`, and `metadata/v6_supply_mappings.csv`
+before the daily pipeline produces signal.
 
 ## Environment variables
 
@@ -94,21 +111,24 @@ The `.env` file is gitignored.
 | 1     | V4, V13                       | shipped Jun 9       |
 | 2     | V12, V2                       | both shipped Jun 22 |
 | 3     | V11                           | shipped Jun 27      |
-| 3     | V1, V7                        | next                |
+| 3     | V1                            | shipped Jun 28      |
+| 3     | V6                            | shipped Jul 3       |
+| 3     | V7                            | next                |
 | 4     | V8, V10, V14, V15 (LLM-based) | planned             |
+
 ## The 15 Vectors
 
-1. Promoters (political ties, board changes, scams, pledging)
-2. Government policies (PLI, anti-dumping, duties, budget)
+1. Promoters (political ties, board changes, scams, pledging) ← Phase 3
+2. Government policies (PLI, anti-dumping, duties, budget) ← Phase 2
 3. Holding companies (subsidiary IPOs, hidden assets)
 4. Input material cost ← Phase 1
 5. Output material cost
-6. Input material supply side
+6. Input material supply side ← Phase 3
 7. Output product demand side
 8. Services companies (recruitment, app downloads, ad-conversion)
 9. Global capex focus (solar, defence, AI, EV, nuclear, space)
 10. User behaviour shifts
-11. 11. Global parallels (parent → Indian subsidiary) ← Phase 3
+11. Global parallels (parent → Indian subsidiary) ← Phase 3
 12. Re-rating scenarios ← Phase 2
 13. Geopolitics & macros ← Phase 1
 14. Structural up/down cycles
