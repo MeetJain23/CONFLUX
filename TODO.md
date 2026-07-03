@@ -289,3 +289,11 @@ issues that don't block the V1 ship but need handling.
   alongside opportunistic ones.** Same NSE record may show `Market Purchase`,
   `Market Sale`, `Off Market`, `ESOP`, `Inter-se Transfer`, `Others`.
   Worth one-pass classification on raw data before scorer design.
+
+  - V6: Universe expansion needed for full coverage:
+  - CHAMBLFERT, COROMANDEL → SUPPLY_MONSOON_DEFICIT, MONSOON_NORMAL_ABOVE, HORMUZ, NATURAL_GAS_SHORTAGE, FORCE_MAJEURE
+  - DEEPAKNTR, GNFC → HORMUZ, NATURAL_GAS_SHORTAGE
+  - GAIL → NATURAL_GAS_SHORTAGE
+  - SUPPLY_NATURAL_GAS_SHORTAGE is currently dead (0 mapped stocks) — will activate on universe expansion
+- V6: multi-day news cycle saturation — capped per-subtype in v0. Revisit if event_severity extractor (Phase 2) provides a cleaner mechanism.
+- V6/V2 shared: peer_magnitude column exists in subtypes CSVs but is 0.00 across all rows. Phase 2 activation for both vectors together.
