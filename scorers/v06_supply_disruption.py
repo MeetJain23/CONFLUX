@@ -56,6 +56,14 @@ CONFIDENCE_BUCKETS = [
 
 RATIONALIZE_TOP_N = 3
 
+# Per-subtype contribution cap. Prevents multi-day news cycle saturation:
+# a continuous 10-day Hormuz story shouldn't accumulate to 10 × the
+# subtype's default magnitude. Cap = subtype.issuer_magnitude × SUBTYPE_CAP_MULT.
+# Set to 1.5 so a single strong event can still push slightly past the default
+# (preserves the "big event feels bigger" property) but sustained coverage
+# can't runaway-saturate. V2 has the same latent issue — backport when V2 is
+# next touched.
+SUBTYPE_CAP_MULT = 1.5
 
 # --- Loaders --------------------------------------------------------------
 
@@ -285,8 +293,32 @@ class SupplyDisruptionScorer(VectorScorer):
         if not contributions:
             return None
 
+        # --- Per-subtype cap: sum contributions within each subtype,
+        # then cap the absolute value at subtype.issuer_magnitude × CAP_MULT.
+        # Preserves direction; kills multi-day news cycle saturation. ---
+        by_subtype: dict[str, float] = {}
+        capped_by_subtype: dict[str, tuple[float, float, bool]] = {}  # subtype -> (uncapped, capped, was_capped)
+
+        for c in contributions:
+            by_subtype[c["subtype"]] = by_subtype.get(c["subtype"], 0.0) + c["contribution"]
+
+        for subtype, uncapped in by_subtype.items():
+            subtype_rule = self.subtypes.get(subtype)
+            if subtype_rule is None:
+                capped_by_subtype[subtype] = (uncapped, uncapped, False)
+                continue
+            cap = abs(subtype_rule["issuer"]) * SUBTYPE_CAP_MULT
+            if abs(uncapped) > cap:
+                capped = math.copysign(cap, uncapped)  # preserve sign
+                capped_by_subtype[subtype] = (uncapped, capped, True)
+            else:
+                capped_by_subtype[subtype] = (uncapped, uncapped, False)
+
+        raw_sum = sum(v[1] for v in capped_by_subtype.values())
+        uncapped_sum = sum(v[0] for v in capped_by_subtype.values())
+        n_capped_subtypes = sum(1 for v in capped_by_subtype.values() if v[2])
+
         # --- Sum + tanh squash. Gain 1.5 matches V2. ---
-        raw_sum = sum(c["contribution"] for c in contributions)
         score = math.tanh(raw_sum * 1.5)
 
         # --- Confidence based on most recent contributing event ---
@@ -323,7 +355,12 @@ class SupplyDisruptionScorer(VectorScorer):
         components["raw_sum"] = round(raw_sum, 4)
         components["n_contributions"] = len(contributions)
         components["min_age_days"] = min_age
-
+        components["raw_sum_uncapped"] = round(uncapped_sum, 4)
+        components["n_capped_subtypes"] = n_capped_subtypes
+        components["subtype_contributions"] = {
+            st: {"uncapped": round(v[0], 4), "capped": round(v[1], 4), "was_capped": v[2]}
+            for st, v in capped_by_subtype.items()
+        }
         return ScoreResult(
             score=score,
             confidence=confidence,
