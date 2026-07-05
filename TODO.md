@@ -290,10 +290,20 @@ issues that don't block the V1 ship but need handling.
   `Market Sale`, `Off Market`, `ESOP`, `Inter-se Transfer`, `Others`.
   Worth one-pass classification on raw data before scorer design.
 
-  - V6: Universe expansion needed for full coverage:
-  - CHAMBLFERT, COROMANDEL → SUPPLY_MONSOON_DEFICIT, MONSOON_NORMAL_ABOVE, HORMUZ, NATURAL_GAS_SHORTAGE, FORCE_MAJEURE
-  - DEEPAKNTR, GNFC → HORMUZ, NATURAL_GAS_SHORTAGE
+  - **V6: universe expansion needed for full coverage. Missing stocks that would activate mappings:**
+  - CHAMBLFERT, COROMANDEL → SUPPLY_MONSOON_DEFICIT, MONSOON_NORMAL_ABOVE, HORMUZ_GULF_DISRUPTION, NATURAL_GAS_SHORTAGE, FORCE_MAJEURE
+  - DEEPAKNTR, GNFC → HORMUZ_GULF_DISRUPTION, NATURAL_GAS_SHORTAGE
   - GAIL → NATURAL_GAS_SHORTAGE
-  - SUPPLY_NATURAL_GAS_SHORTAGE is currently dead (0 mapped stocks) — will activate on universe expansion
-- V6: multi-day news cycle saturation — capped per-subtype in v0. Revisit if event_severity extractor (Phase 2) provides a cleaner mechanism.
-- V6/V2 shared: peer_magnitude column exists in subtypes CSVs but is 0.00 across all rows. Phase 2 activation for both vectors together.
+  - SUPPLY_NATURAL_GAS_SHORTAGE currently has zero mapped stocks; will activate when fertilizer/gas cluster joins universe.
+
+- V6: multi-day news cycle saturation handled via per-subtype contribution cap (issuer_magnitude × 1.5) in v0. Revisit when event_severity extractor (Phase 2) provides a per-event scaling mechanism — cap can then be relaxed or removed.
+
+- V6/V2 shared: peer_magnitude column exists in both subtypes CSVs but is 0.00 across all rows. Phase 2 activation for both vectors together — same calibration exercise.
+
+- V2 latent: same multi-day news cycle saturation as V6 (UPL ANTI_DUMPING_CHEMICALS was the flagged case). V6's per-subtype cap logic is the reference implementation for the eventual V2 backport.
+
+- V6 CHINA_API_DUMP / PHARMA_API_DISRUPTION: queries removed as noise-generating (AI export stories, unrelated anti-dumping news like China taxing Canadian pea starch). Regex patterns kept in classifier for when real pharma events surface via other queries. Real pharma API disruption events are genuinely quiet in current cycle. Revisit query set when Indian Pharmaceutical Alliance / DGTR bulletins are needed as sources.
+
+- V6 OPEC_CUT: silent in current news window because OPEC+ is unwinding cuts, not adding them. Regex is fine; when the cycle turns, coverage will return automatically.
+
+- V6 Phase 2: activate source_country and event_severity fields on SupplyEvent that are currently persisted but ignored by v0 scorer. source_country for per-pair magnitude override (Yemen-Red-Sea vs Iran-Hormuz differentiation), event_severity for per-event scaling instead of subtype-default.
