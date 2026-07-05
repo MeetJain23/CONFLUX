@@ -46,15 +46,16 @@ signed magnitude × time decay × cluster bonus. Sparse by design: only fires
 when promoter or KMP activity is disclosed within the lookback window.
 Reads the underlying signal without laundering it through news sentiment.
 
-**Phase 3 (V6 shipped Jul 3):** V6 supply disruption — discrete supply-side
-events across 12 subtype categories (monsoon deficit/surplus, Hormuz corridor,
-China steel cuts, China API dumping/disruption, critical minerals curbs,
-semiconductor shortage, OPEC cuts, natural gas allocation, global tariff
-shocks, force majeure). Mode-A-only architecture: only stocks explicitly
-mapped in the moat file receive signal — same sparse-vector pattern as
-V1 and V11. Per-subtype contribution cap prevents multi-day news cycle
-saturation (10 consecutive Hormuz stories don't accumulate to 10× the
-default magnitude; direction preserved, magnitude bounded).
+**Phase 3 (V6 shipped Jul 4):** V6 supply disruption — discrete supply-side
+events across 12 subtype categories (monsoon, Hormuz corridor, China steel /
+API / critical minerals, semiconductor shortage, OPEC cuts, India natural gas,
+global tariff shocks, force majeure). Mode-A-only architecture: only stocks
+explicitly mapped in the moat file receive signal — same sparse-vector pattern
+as V1 and V11. Per-subtype contribution cap prevents multi-day news cycle
+saturation. Currently 6 of 12 subtypes actively firing given the news window;
+remainder await either their event class showing up in the news cycle (OPEC
+cuts, pharma API disruption) or universe expansion (natural gas via GAIL and
+fertilizer names).
 
 **Deployment (shipped Jun 25):** Public dashboard at [conflux.streamlit.app](https://conflux.streamlit.app).
 Deployed via Streamlit Cloud with private Cloudflare R2 backing the SQLite DB
@@ -112,7 +113,7 @@ The `.env` file is gitignored.
 | 2     | V12, V2                       | both shipped Jun 22 |
 | 3     | V11                           | shipped Jun 27      |
 | 3     | V1                            | shipped Jun 28      |
-| 3     | V6                            | shipped Jul 3       |
+| 3     | V6                            | shipped Jul 4       |
 | 3     | V7                            | next                |
 | 4     | V8, V10, V14, V15 (LLM-based) | planned             |
 
