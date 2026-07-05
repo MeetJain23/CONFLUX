@@ -120,6 +120,11 @@ CLASSIFICATION_PATTERNS = [
     (re.compile(r"\bchip\s+shortage|chip\s+allocation\s+(cut|reduce)"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
     (re.compile(r"\btsmc.*(capacity|allocation).*(cut|constraint)"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
     (re.compile(r"\basml.*export.*(restrict|curb|ban)"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
+    (re.compile(r"\bmemory[\s-]?chip\s+(shortage|crisis)"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
+    (re.compile(r"\bmemory\s+shortage"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
+    (re.compile(r"\bai\s+memory\s+shortage"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
+    (re.compile(r"\bdram\s+(shortage|crisis)"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
+    (re.compile(r"\bhbm\s+shortage"), "SUPPLY_SEMICONDUCTOR_SHORTAGE"),
 
     # OPEC (global; direction negative for refiners, positive for upstream)
     (re.compile(r"\bopec\+?.*(production\s+cut|output\s+cut|cut\s+production)"), "SUPPLY_OPEC_CUT"),
@@ -321,6 +326,8 @@ def ingest_supply_news(lookback_days: int = DEFAULT_LOOKBACK_DAYS,
                 subtype = classify_item(title, summary_text)
                 if subtype is None:
                     summary["skipped_unclassified"] += 1
+                    # TEMP: log unclassified for regex tuning. Remove after patch lands.
+
                     continue
 
                 summary["classified"] += 1
