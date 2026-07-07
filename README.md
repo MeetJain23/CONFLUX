@@ -5,7 +5,7 @@
 🔗 **Live dashboard:** [conflux.streamlit.app](https://conflux.streamlit.app)
 
 A multi-vector confluence engine for the Indian equity market. Built on the framework
-of 15 fundamental vectors that drive stock returns — input/output material costs,
+of 15 fundamental vectors that drive stock returns which are input/output material costs,
 government policy, promoter quality, supply/demand-side dynamics, macros, re-rating
 catalysts, global parallels, and structural cycles.
 
@@ -18,35 +18,35 @@ This is an **idea-generation engine**, not an auto-trader. Outputs go to a human
 
 ## Architecture (four layers)
 
-1. **Stock Metadata Graph** — hand-curated facts per stock (sectors, input commodities,
+1. **Stock Metadata Graph** - hand-curated facts per stock (sectors, input commodities,
    customers, suppliers, global parents, promoter groups, peers). This is the moat.
-2. **Data Ingestion Pipelines** — scheduled jobs that fetch prices, commodities, FX,
+2. **Data Ingestion Pipelines** - scheduled jobs that fetch prices, commodities, FX,
    rates, corporate announcements, policy news, insider trades, supply-disruption news.
-3. **Vector Scorers** — one module per vector. Each outputs -1.0 to +1.0 per stock per day.
-4. **Confluence Engine + Dashboard** — aggregates active vectors, ranks setups, Streamlit UI.
+3. **Vector Scorers** - one module per vector. Each outputs -1.0 to +1.0 per stock per day.
+4. **Confluence Engine + Dashboard** - aggregates active vectors, ranks setups, Streamlit UI.
 
 ## Status
 
 **Phase 1 (shipped Jun 9):** Foundation + V4 (input material cost) + V13 (geopolitics & macros).
 
-**Phase 2 (V12 + V2 shipped):** V12 re-rating catalysts (shipped Jun 15) and V2 government
+**Phase 2 (V12 + V2 shipped):** V12 re-rating catalysts: (shipped Jun 15) and V2 government
 policy (shipped Jun 22). V2 uses a hybrid stock-targeting design (see ADR-003):
 explicit per-policy mappings as the moat, inferred fallback via existing
 metadata for common patterns, unmapped events ingest but produce no signal.
 
-**Phase 3 (V11 shipped Jun 27):** V11 global parallels — for stocks with an
+**Phase 3 (V11 shipped Jun 27):** V11 global parallels:  for stocks with an
 international parent company, scores the gap between the Indian subsidiary's
 actual return and the β-implied expected return from parent moves. Catch-up
 bullish when sub lags parent; fade bearish when sub leads. Currently scores
 16 of 86 stocks (those with public parent listings in the universe).
 
-**Phase 3 (V1 shipped Jun 28):** V1 promoters — insider trades from SEBI PIT
+**Phase 3 (V1 shipped Jun 28):** V1 promoters: insider trades from SEBI PIT
 Regulation 7(2) disclosures. Tanh-squashed scoring with category × mode ×
 signed magnitude × time decay × cluster bonus. Sparse by design: only fires
 when promoter or KMP activity is disclosed within the lookback window.
 Reads the underlying signal without laundering it through news sentiment.
 
-**Phase 3 (V6 shipped Jul 4):** V6 supply disruption — discrete supply-side
+**Phase 3 (V6 shipped Jul 4):** V6 supply disruption: discrete supply-side
 events across 12 subtype categories (monsoon, Hormuz corridor, China steel /
 API / critical minerals, semiconductor shortage, OPEC cuts, India natural gas,
 global tariff shocks, force majeure). Mode-A-only architecture: only stocks
