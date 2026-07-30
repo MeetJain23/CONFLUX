@@ -210,7 +210,7 @@ class NSESession:
                     )
                     logger.warning(str(last_error))
                 
-            except requests.RequestException as e:
+            except requests.exceptions.RequestException as e:
                 last_error = NSESessionError(f"Network error: {e}")
                 logger.warning(f"Network error on attempt {attempt}: {e}")
             
