@@ -39,7 +39,8 @@ class Stock(Base):
     in_nifty500 = Column(Boolean, default=False)
     promoter_group = Column(String(200))    # e.g. "Tata Sons", "Mukesh Ambani family"
     global_parent = Column(String(200))     # for V11 — e.g. "Hitachi Ltd (Japan)"
-    parent_ticker = Column(String, nullable=True)
+    parent_ticker = Column(String(50), nullable=True)
+    tier = Column(Integer, default=2, nullable=False)  # 1 = fully curated (all vectors), 2 = automated coverage only
     active = Column(Boolean, default=True)
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -491,6 +492,22 @@ class SupplyEvent(Base):
 # ---------------------------------------------------------------------------
 
 def get_engine(db_path: str = "data/conflux.db"):
+    """
+    Engine factory, env-driven (ADR-003).
+
+    If CONFLUX_DATABASE_URL is set (e.g. Neon Postgres:
+    postgresql+psycopg://user:pass@host/db?sslmode=require), use it.
+    Otherwise fall back to local SQLite — every existing script keeps
+    working unchanged on your machine.
+
+    pool_pre_ping revalidates connections; serverless Postgres (Neon)
+    closes idle connections and this prevents 'server closed connection'
+    errors on the next query.
+    """
+    import os
+    url = os.getenv("CONFLUX_DATABASE_URL")
+    if url:
+        return create_engine(url, future=True, pool_pre_ping=True, pool_recycle=300)
     Path(db_path).parent.mkdir(parents=True, exist_ok=True)
     return create_engine(f"sqlite:///{db_path}", future=True)
 
