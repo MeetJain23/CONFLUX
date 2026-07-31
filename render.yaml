@@ -1,0 +1,18 @@
+# Render Blueprint — deploys the CONFLUX API free tier from this repo.
+# Free tier note: the service sleeps after 15 min idle; first request after
+# sleep takes ~50s. The frontend shows a "waking the engine" state for this.
+services:
+  - type: web
+    name: conflux-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: CONFLUX_DATABASE_URL
+        sync: false        # paste the conflux_ro Neon URL in the Render dashboard
+      - key: ALLOWED_ORIGINS
+        sync: false        # e.g. https://conflux-yourname.vercel.app
+      - key: PYTHON_VERSION
+        value: 3.12.3

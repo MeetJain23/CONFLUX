@@ -1,0 +1,6 @@
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+slowapi==0.1.9
+SQLAlchemy==2.0.41
+psycopg[binary]==3.2.9
+python-dotenv==1.1.0
