@@ -65,7 +65,7 @@ VECTOR_NAMES = {
 
 limiter = Limiter(key_func=get_remote_address,
                   default_limits=["600/hour", "60/minute"],
-                  headers_enabled=True)
+                  headers_enabled=False)  # X-RateLimit-* headers are a privacy leak behind Render's proxy
 
 app = FastAPI(title="CONFLUX API", version="2.0",
               docs_url=None, redoc_url=None, openapi_url=None)  # no public schema surface
