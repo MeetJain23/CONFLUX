@@ -1,4 +1,8 @@
 """
+
+# SUPERSEDED: scored directly against Neon, which drops connections. Use score_local + sync_to_neon instead
+
+
 Daily runner v3 — connection-resilient for Neon free tier.
 
 Same pipeline as v2, but hardened against Neon dropping idle connections:

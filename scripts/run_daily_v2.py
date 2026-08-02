@@ -1,4 +1,8 @@
 """
+# SUPERSEDED: scored directly against Neon, which drops connections. Use score_local + sync_to_neon instead
+
+
+
 Daily runner v2 — the expanded-universe orchestrator.
 
     python -m scripts.run_daily_v2               # latest trading day
