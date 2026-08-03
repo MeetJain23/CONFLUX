@@ -131,7 +131,7 @@ select{cursor:pointer}
   <section class="hero">
     <div class="eyebrow">Confluence rankings / NSE equities</div>
     <h1>Single vectors are noise. <em>Confluence</em> is signal.</h1>
-    <p>CONFLUX scores Indian equities across independent fundamental vectors . policy, input costs, supply, promoter activity, re-rating, macro, then surfaces the names where those signals <em style="color:var(--paper);font-style:normal">agree</em>. Every score opens into the exact evidence beneath it. No black box.</p>
+    <p>CONFLUX scores Indian equities across independent fundamental vectors: policy, input costs, supply, promoter activity, re-rating, macro. It then surfaces the names where those signals <em style="color:var(--paper);font-style:normal">agree</em>. Every score opens into the exact evidence beneath it. No black box.</p>
     <div class="tape-wrap"><span class="live"><span class="dot"></span>top signals</span><div class="tape" id="tape"></div></div>
   </section>
 
@@ -158,7 +158,7 @@ select{cursor:pointer}
 
   <footer class="foot">
     <p><b>Educational research tool. Not investment advice. Not a SEBI-registered investment adviser.</b></p>
-    <p style="margin-top:6px">Glass-box by design . bar length is signal strength, opacity is confidence. Curated names carry all vectors; automated names carry the subset that computes without hand mapping, at honest confidence.</p>
+    <p style="margin-top:6px">Glass-box by design, bar length is signal strength, opacity is confidence. Curated names carry all vectors; automated names carry the subset that computes without hand mapping, at honest confidence.</p>
   </footer>
 </div>
 
@@ -183,7 +183,7 @@ function dvg(v,max,conf){
 
 async function boot(){
   const m=document.getElementById('msg');
-  const t=setTimeout(()=>m.innerHTML='<div class="note"><span class="spin"></span>Waking the engine . the free-tier server sleeps when idle, so the first load can take up to a minute. Every load after is instant.</div>',2200);
+  const t=setTimeout(()=>m.innerHTML='<div class="note"><span class="spin"></span>Waking the engine, the free-tier server sleeps when idle, so the first load can take up to a minute. Every load after is instant.</div>',2200);
   try{
     META=await j('/api/meta'); clearTimeout(t); m.innerHTML='';
     document.getElementById('stat').innerHTML=
@@ -250,7 +250,7 @@ async function openStock(sym){
       });
       h+=`</ol>`;
     }else{
-      h+=`<p class="note" style="margin-top:22px">No confluence score yet for this instrument . likely an automated-tier name whose applicable vectors have not fired. Absence is honest here, not an error.</p>`;
+      h+=`<p class="note" style="margin-top:22px">No confluence score yet for this instrument, likely an automated-tier name whose applicable vectors have not fired. Absence is honest here, not an error.</p>`;
     }
     b.innerHTML=h;
   }catch(e){b.innerHTML='<button class="dclose" onclick="closeD()">&times;</button><p class="note">Couldn\'t load this instrument. Retry shortly.</p>';}
