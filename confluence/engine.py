@@ -33,6 +33,20 @@ VECTOR_WEIGHTS = {
 
 POS_THRESHOLD = 0.15        # |score| above this counts as "active positive/negative"
 
+# Breadth shrinkage (ADR-004): the composite is a confidence-weighted MEAN, which
+# normalizes away how many vectors agree — so a single vector at 1.0 tied a
+# three-vector consensus at 0.857. That inverts the entire thesis ("single
+# vectors are noise, confluence is signal"). We multiply the mean by a saturating
+# breadth factor n/(n+k) so agreement across vectors is rewarded with diminishing
+# returns. k=2 chosen empirically against the live universe: it sinks lone-vector
+# signals, lets a strong 3-vector consensus lead, and never lets a pile of weak
+# vectors runaway-win. Read as: a signal must overcome the weight of ~2 absent vectors.
+BREADTH_K = 2.0
+
+
+def breadth_factor(n_active: int, k: float = BREADTH_K) -> float:
+    return n_active / (n_active + k) if n_active > 0 else 0.0
+
 
 def classify_direction(composite: float) -> str:
     if composite >= 0.20:
@@ -81,7 +95,8 @@ def compute_confluence(asof: date_type, session=None):
                 "rationale": s.rationale,
             }
 
-        composite = weighted_sum / weight_total if weight_total > 0 else 0.0
+        raw_mean = weighted_sum / weight_total if weight_total > 0 else 0.0
+        composite = raw_mean * breadth_factor(len(scores))
 
         # Upsert
         existing = (
