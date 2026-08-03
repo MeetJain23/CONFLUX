@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CONFLUX . multi-vector confluence engine for Indian equities</title>
+<meta name="description" content="A glass-box confluence engine. Every score decomposes into the vectors that produced it." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500&family=Fraunces:opsz,wght@9.144,400;9.144,500;9.144,600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#F0EBDE; --ink2:#F7F3E9; --line:#DDD5C2; --line2:#C9BFA6;
+  --paper:#201C15; --mut:#6E6553; --dim:#948A74;
+  --pos:#1C6B45; --neg:#B23A26; --amber:#9A6B1F;
+  --disp:'Fraunces','Georgia',serif; --mono:'IBM Plex Mono',monospace; --body:'Inter',sans-serif;
+}
+*{margin:0;box-sizing:border-box}
+html{color-scheme:dark}
+body{background:var(--ink);color:var(--paper);font-family:var(--body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1140px;margin:0 auto;padding:0 24px}
+
+/* ---- masthead ---- */
+.top{border-top:2px solid var(--pos);border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(22,21,15,.92);backdrop-filter:blur(8px);z-index:20}
+.top-in{display:flex;align-items:baseline;justify-content:space-between;gap:20px;padding:16px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:14px}
+.mark{font-family:var(--disp);font-weight:600;font-size:24px;letter-spacing:.02em;color:#F0EBDE}
+.mark b{color:#4FB783}
+.sub{font-size:12px;color:#948A74;letter-spacing:.02em}
+.stat{display:flex;gap:22px}
+.stat div{display:flex;flex-direction:column}
+.stat .k{font-family:var(--mono);font-size:15px;color:#F0EBDE;font-weight:500}
+.stat .l{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-top:2px}
+
+/* ---- hero strip ---- */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--pos);margin-bottom:16px}
+.hero{padding:40px 0 30px;border-bottom:1px solid var(--line)}
+.hero h1{font-family:var(--disp);font-weight:500;font-size:38px;line-height:1.1;letter-spacing:-.015em;max-width:17ch}
+.hero h1 em{font-style:normal;color:var(--pos)}
+.hero p{color:var(--mut);margin-top:14px;max-width:56ch;font-size:15px}
+.tape-wrap{margin-top:26px}
+.live{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+.live .dot{width:6px;height:6px;border-radius:50%;background:var(--pos);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.tape{display:flex;gap:0;border:1px solid var(--line);border-radius:2px;overflow:hidden}
+.tcell{flex:1;padding:12px 14px;border-right:1px solid var(--line);min-width:0}
+.tcell:last-child{border-right:0}
+.tcell .s{font-family:var(--mono);font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tcell .v{font-family:var(--mono);font-size:17px;font-weight:500;margin-top:3px}
+
+/* ---- controls ---- */
+.bar{display:flex;gap:10px;align-items:center;padding:20px 0 14px;flex-wrap:wrap}
+.search{position:relative;flex:1 1 240px;min-width:200px}
+.search input,select{background:var(--ink2);border:1px solid var(--line2);color:var(--paper);border-radius:2px;padding:9px 11px;font-size:13px;font-family:var(--body)}
+.search input{width:100%}
+select{cursor:pointer}
+.search input:focus,select:focus{outline:none;border-color:var(--dim)}
+.hits{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 4px);background:var(--ink2);border:1px solid var(--line2);border-radius:2px;max-height:280px;overflow:auto}
+.hits button{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);color:var(--paper);padding:9px 11px;cursor:pointer;font-size:13px;font-family:var(--body)}
+.hits button:hover{background:var(--line)}
+.hits .hs{font-family:var(--mono);color:var(--pos);margin-right:8px}
+
+/* ---- table ---- */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead th{font-family:var(--disp);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2);cursor:pointer;user-select:none;white-space:nowrap}
+.tbl thead th.r{text-align:right}
+.tbl thead th:hover{color:var(--mut)}
+.tbl tbody td{padding:11px 12px;border-bottom:1px solid var(--line)}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover{background:var(--ink2)}
+.rk{font-family:var(--mono);color:var(--dim);width:44px;text-align:right;font-size:13px}
+.sym{font-family:var(--mono);font-weight:500;font-size:14px;color:var(--paper)}
+.nm{color:var(--mut);font-size:12px;margin-left:8px}
+.sec{color:var(--dim);font-size:12px}
+.cmp{font-family:var(--mono);font-size:14px;text-align:right;font-weight:500}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .neu{color:var(--mut)}
+.barcell{width:150px}
+.dvg{position:relative;height:7px;background:var(--line2);border-radius:1px;overflow:hidden}
+.dvg .spine{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--dim);opacity:.5}
+.dvg .fill{position:absolute;top:0;bottom:0;border-radius:1px}
+.vec{font-family:var(--mono);font-size:12px;color:var(--mut);text-align:right;white-space:nowrap}
+.t1{color:var(--amber);border:1px solid rgba(74,151,130,.5);font-size:9px;padding:1px 5px;border-radius:2px;margin-left:8px;letter-spacing:.06em;text-transform:uppercase}
+.hide-sm{}
+@media(max-width:720px){.hide-sm{display:none}.barcell{width:80px}}
+
+/* ---- drawer ---- */
+.scrim{position:fixed;inset:0;background:rgba(10,9,5,.74);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(580px,100%);background:var(--ink2);border-left:1px solid var(--line2);z-index:41;transform:translateX(100%);transition:transform .22s cubic-bezier(.3,0,.2,1);overflow-y:auto;padding:26px 26px 48px}
+.drawer.on{transform:none}
+.dclose{position:absolute;top:16px;right:18px;background:none;border:0;color:var(--mut);font-size:24px;cursor:pointer;line-height:1;font-family:var(--body)}
+.dhead .dsym{font-family:var(--disp);font-size:26px;font-weight:500;letter-spacing:.02em}
+.dhead .dnm{color:var(--mut);font-size:13px;margin-top:3px}
+.dcomp{display:flex;align-items:baseline;gap:14px;margin:22px 0 4px}
+.dcomp .big{font-family:var(--mono);font-size:36px;font-weight:600}
+.dpill{font-family:var(--disp);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:3px 10px;border-radius:2px}
+.dpill.pos{color:var(--pos);border:1px solid rgba(232,178,58,.45)}
+.dpill.neg{color:var(--neg);border:1px solid rgba(216,90,60,.45)}
+.dpill.neu{color:var(--mut);border:1px solid var(--line2)}
+.dmeta{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.lgd{font-family:var(--disp);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:26px 0 4px}
+.lgd-note{font-size:12px;color:var(--mut);margin-bottom:14px}
+.led{list-style:none}
+.lrow{padding:13px 0;border-bottom:1px solid var(--line)}
+.ltop{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.lname{font-size:13px;color:var(--paper)}
+.lnum{font-family:var(--mono);font-size:12px}
+.lnum em{font-style:normal;color:var(--dim);font-size:11px}
+.lbar{margin-top:7px}
+.lrat{margin-top:8px;font-size:12px;color:var(--mut);border-left:2px solid var(--line2);padding-left:10px;line-height:1.55}
+.foot{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 50px;color:var(--dim);font-size:12px}
+.foot b{color:var(--mut);font-weight:500}
+.note{background:var(--ink2);border:1px solid var(--line);border-left:2px solid var(--amber);padding:11px 14px;border-radius:2px;color:var(--mut);font-size:13px;margin:16px 0}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid var(--line2);border-top-color:var(--pos);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.live .dot{animation:none}.drawer{transition:none}.dvg .fill{transition:none}}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}.dvg .fill{transition:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap top-in">
+  <div class="brand">
+    <span class="mark">CON<b>FLUX</b></span>
+    <span class="sub">multi-vector confluence engine · NSE</span>
+  </div>
+  <div class="stat" id="stat"></div>
+</div></header>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Confluence rankings / NSE equities</div>
+    <h1>Single vectors are noise. <em>Confluence</em> is signal.</h1>
+    <p>CONFLUX scores Indian equities across independent fundamental vectors . policy, input costs, supply, promoter activity, re-rating, macro, then surfaces the names where those signals <em style="color:var(--paper);font-style:normal">agree</em>. Every score opens into the exact evidence beneath it. No black box.</p>
+    <div class="tape-wrap"><span class="live"><span class="dot"></span>top signals</span><div class="tape" id="tape"></div></div>
+  </section>
+
+  <div class="bar">
+    <div class="search">
+      <input id="q" placeholder="Search symbol or company" autocomplete="off" />
+      <div id="hits"></div>
+    </div>
+    <select id="f-sector"><option value="">All sectors</option></select>
+    <select id="f-tier"><option value="">All tiers</option><option value="1">Curated</option><option value="2">Automated</option></select>
+    <select id="f-dir"><option value="">All directions</option><option value="bullish">Bullish</option><option value="bearish">Bearish</option><option value="neutral">Neutral</option></select>
+    <select id="f-sort"><option value="abs">Strongest signal</option><option value="desc">Most bullish</option><option value="asc">Most bearish</option></select>
+  </div>
+
+  <div id="msg"></div>
+
+  <table class="tbl">
+    <thead><tr>
+      <th class="r">#</th><th>Instrument</th><th class="hide-sm">Sector</th>
+      <th class="r">Composite</th><th class="barcell"></th><th class="r hide-sm">Vectors</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <footer class="foot">
+    <p><b>Educational research tool. Not investment advice. Not a SEBI-registered investment adviser.</b></p>
+    <p style="margin-top:6px">Glass-box by design . bar length is signal strength, opacity is confidence. Curated names carry all vectors; automated names carry the subset that computes without hand mapping, at honest confidence.</p>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer"><div id="dbody"></div></aside>
+
+<script>
+const API="https://conflux-api-ro1u.onrender.com";
+const VN={1:"Promoters & insider activity",2:"Government policy",3:"Holding companies",4:"Input material cost",5:"Output material cost",6:"Input supply side",7:"Output demand side",8:"Services signals",9:"Global capex focus",10:"User behaviour shifts",11:"Global parallels",12:"Re-rating catalysts",13:"Geopolitics & macros",14:"Structural cycles",15:"Moat & capital efficiency"};
+const fmt=x=>x==null?".":(x>0?"+":"")+x.toFixed(3);
+const cls=x=>x==null?"neu":x>0.02?"pos":x<-0.02?"neg":"neu";
+const clean=s=>s.replace(/_INTL$/,"");
+let META=null, MAXABS=0.6, state={sector:"",tier:"",direction:"",sort:"abs"};
+
+async function j(p){const r=await fetch(API+p);if(!r.ok)throw new Error(r.status);return r.json();}
+
+function dvg(v,max,conf){
+  const pct=Math.min(Math.abs(v)/max,1)*50, pos=v>=0;
+  const op=conf==null?1:(.35+.65*Math.max(0,Math.min(conf,1)));
+  return `<div class="dvg"><div class="spine"></div><div class="fill ${pos?'pos':'neg'}" style="${pos?'left':'right'}:50%;width:${pct}%;background:${pos?'var(--pos)':'var(--neg)'};opacity:${op}"></div></div>`;
+}
+
+async function boot(){
+  const m=document.getElementById('msg');
+  const t=setTimeout(()=>m.innerHTML='<div class="note"><span class="spin"></span>Waking the engine . the free-tier server sleeps when idle, so the first load can take up to a minute. Every load after is instant.</div>',2200);
+  try{
+    META=await j('/api/meta'); clearTimeout(t); m.innerHTML='';
+    document.getElementById('stat').innerHTML=
+      `<div><span class="k">${META.latest_date??'.'}</span><span class="l">as of</span></div>
+       <div><span class="k">${META.universe_active}</span><span class="l">instruments</span></div>
+       <div><span class="k">${META.tier1_curated}</span><span class="l">curated</span></div>`;
+    const sel=document.getElementById('f-sector');
+    (META.sectors||[]).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+    await load(); tape();
+  }catch(e){clearTimeout(t);m.innerHTML='<div class="note">The engine isn\'t reachable right now. If this is a cold start, give it a minute and reload.</div>';}
+}
+
+async function tape(){
+  try{
+    const d=await j('/api/rankings?sort=abs&limit=6');
+    document.getElementById('tape').innerHTML=d.rows.map(r=>
+      `<div class="tcell"><div class="s">${clean(r.symbol)} · ${r.n_active} vec</div><div class="v ${cls(r.composite)}">${fmt(r.composite)}</div></div>`).join('');
+  }catch(e){}
+}
+
+async function load(){
+  const rows=document.getElementById('rows');
+  try{
+    const p=new URLSearchParams({sort:state.sort,limit:100});
+    if(state.sector)p.set('sector',state.sector);
+    if(state.tier)p.set('tier',state.tier);
+    if(state.direction)p.set('direction',state.direction);
+    const d=await j('/api/rankings?'+p.toString());
+    MAXABS=Math.max(.3,.d.rows.map(r=>Math.abs(r.composite)));
+    rows.innerHTML=d.rows.map((r,i)=>`
+      <tr onclick="openStock('${r.symbol}')">
+        <td class="rk">${i+1}</td>
+        <td><span class="sym">${clean(r.symbol)}</span><span class="nm">${r.name||''}</span>${r.tier===1?'<span class="t1">curated</span>':''}</td>
+        <td class="sec hide-sm">${r.sector??'.'}</td>
+        <td class="cmp ${cls(r.composite)}">${fmt(r.composite)}</td>
+        <td class="barcell">${dvg(r.composite,MAXABS)}</td>
+        <td class="vec hide-sm">${r.n_pos}&#9650; ${r.n_neg}&#9660; / ${r.n_active}</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="note" style="display:table-cell">No instruments match this filter.</td></tr>';
+  }catch(e){rows.innerHTML='<tr><td colspan="6" class="note" style="display:table-cell">Couldn\'t load rankings. Retry shortly.</td></tr>';}
+}
+
+async function openStock(sym){
+  const sc=document.getElementById('scrim'),dr=document.getElementById('drawer'),b=document.getElementById('dbody');
+  sc.classList.add('on');dr.classList.add('on');document.body.style.overflow='hidden';
+  b.innerHTML='<button class="dclose" onclick="closeD()">&times;</button><p class="note"><span class="spin"></span>Loading vector ledger…</p>';
+  try{
+    const d=await j('/api/stock/'+encodeURIComponent(sym));
+    const L=d.latest;
+    let h=`<button class="dclose" onclick="closeD()">&times;</button>
+      <div class="dhead"><div class="dsym">${clean(d.symbol)}</div><div class="dnm">${d.name||''}${d.sector?' · '+d.sector:''}${d.tier===1?'<span class="t1">curated</span>':''}</div></div>`;
+    if(L){
+      h+=`<div class="dcomp"><span class="big ${cls(L.composite)}">${fmt(L.composite)}</span>
+          <span class="dpill ${L.direction==='bullish'?'pos':L.direction==='bearish'?'neg':'neu'}">${L.direction}</span></div>
+          <div class="dmeta">${L.n_active} vectors active · ${L.n_pos} positive · ${L.n_neg} negative · ${L.date}</div>
+          <div class="lgd">Vector ledger</div>
+          <div class="lgd-note">Bar length is the score; opacity is the confidence weighting it. Nothing hidden.</div>
+          <ol class="led">`;
+      L.vectors.forEach(v=>{
+        h+=`<li class="lrow"><div class="ltop">
+             <span class="lname">V${v.vector_id} · ${v.vector_name||VN[v.vector_id]||''}</span>
+             <span class="lnum ${cls(v.score)}">${fmt(v.score)} <em>×${(v.confidence??1).toFixed(2)}</em></span></div>
+             <div class="lbar">${dvg(v.score||0,1,v.confidence)}</div>
+             ${v.rationale?`<div class="lrat">${v.rationale}</div>`:''}</li>`;
+      });
+      h+=`</ol>`;
+    }else{
+      h+=`<p class="note" style="margin-top:22px">No confluence score yet for this instrument . likely an automated-tier name whose applicable vectors have not fired. Absence is honest here, not an error.</p>`;
+    }
+    b.innerHTML=h;
+  }catch(e){b.innerHTML='<button class="dclose" onclick="closeD()">&times;</button><p class="note">Couldn\'t load this instrument. Retry shortly.</p>';}
+}
+function closeD(){document.getElementById('scrim').classList.remove('on');document.getElementById('drawer').classList.remove('on');document.body.style.overflow='';}
+document.getElementById('scrim').addEventListener('click',closeD);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeD();});
+
+['f-sector','f-tier','f-dir','f-sort'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',e=>{
+    const k=id==='f-dir'?'direction':id.replace('f-','');
+    state[k]=e.target.value; load();
+  });
+});
+
+let qt;
+document.getElementById('q').addEventListener('input',e=>{
+  clearTimeout(qt);const v=e.target.value.trim();const box=document.getElementById('hits');
+  if(v.length<2){box.innerHTML='';return;}
+  qt=setTimeout(async()=>{
+    try{const d=await j('/api/search?q='+encodeURIComponent(v));
+      box.innerHTML=d.rows.map(r=>`<button onclick="openStock('${r.symbol}');document.getElementById('q').value='';document.getElementById('hits').innerHTML=''"><span class="hs">${clean(r.symbol)}</span>${r.name||''}${r.tier===1?'<span class="t1">curated</span>':''}</button>`).join('');
+    }catch(e){box.innerHTML='';}
+  },260);
+});
+
+boot();
+</script>
+</body>
+</html>
