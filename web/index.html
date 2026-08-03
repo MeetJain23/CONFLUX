@@ -212,7 +212,7 @@ async function load(){
     if(state.tier)p.set('tier',state.tier);
     if(state.direction)p.set('direction',state.direction);
     const d=await j('/api/rankings?'+p.toString());
-    MAXABS=Math.max(.3,.d.rows.map(r=>Math.abs(r.composite)));
+    MAXABS=Math.max(.3,...d.rows.map(r=>Math.abs(r.composite)));
     rows.innerHTML=d.rows.map((r,i)=>`
       <tr onclick="openStock('${r.symbol}')">
         <td class="rk">${i+1}</td>
